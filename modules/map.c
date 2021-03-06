@@ -2,19 +2,15 @@
 
 
 /* --------------------------------------------------------
- * ----------------------- MAP ----------------------------
+ * ----------------------- MAP ------------------------
  * ------------------ IMPLEMENTATION ----------------------
  * --------------------------------------------------------
  */
 
-/* ----------- System header files  --------- */
 #include <stdlib.h>
 
-/* -------- User-defined header files ------- */
 #include "map.h"
 #include "linkedList.h"	
-
-
 #define FIRST_HASH_SIZE 53
 // Χρησιμοποιούμε open addressing, οπότε σύμφωνα με την θεωρία, πρέπει πάντα να διατηρούμε
 // τον load factor του  hash table μικρότερο ή ίσο του 0.5, για να έχουμε αποδoτικές πράξεις
@@ -188,7 +184,7 @@ bool map_remove(Map map, Pointer key) {
 	return false;
 }
 
- Αναζήτηση στο map, με σκοπό να επιστραφεί το value του κλειδιού που περνάμε σαν όρισμα.
+// Αναζήτηση στο map, με σκοπό να επιστραφεί το value του κλειδιού που περνάμε σαν όρισμα.
 
 Pointer map_find(Map map, Pointer key) {
 	MapNode node = map_find_node(map, key);
@@ -211,7 +207,7 @@ DestroyFunc map_set_destroy_value(Map map, DestroyFunc destroy_value) {
 	return old;
 }
 
- Απελευθέρωση μνήμης που δεσμεύει το map
+// Απελευθέρωση μνήμης που δεσμεύει το map
 void map_destroy(Map map) {
 
 	// Διατρέχουμε όλες τις λίστες του πίνακα λιστών 
