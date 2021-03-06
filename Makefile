@@ -2,9 +2,10 @@
 INCLUDE = include
 MODULES = modules
 SOURCE = src
-INPUT = inputfile.txt
+MISC = misc
 # Command line arguments
-ARGS = 
+ARGS = -c $(MISC)/inputfile.txt -b 100 
+
 
 # Compiler
 CC = gcc 
@@ -15,20 +16,22 @@ LDFLAGS = -lm
 
 # .o files
 OBJS = $(SOURCE)/vaccineMonitor.o $(MODULES)/linkedList.o  $(MODULES)/bloomFilter.o  $(MODULES)/skipList.o  $(MODULES)/generalFunctions.o 
-
+OBJS2= $(SOURCE)/ADTMap_test.o $(MODULES)/map.o $(MODULES)/linkedList.o
 # The executable program
 EXEC = vaccineMonitor
-
+EXEC2 = ADTMap_test
 # Run targets
 
 $(EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $(EXEC) $(LDFLAGS)
 
+$(EXEC2): $(OBJS2)
+	$(CC) $(OBJS2) -o $(EXEC2) $(LDFLAGS)
 clean:
-	rm -f $(OBJS) $(EXEC) 
+	rm -f $(OBJS) $(EXEC) $(OBJS2) $(EXEC2)
 
-run: $(EXEC)
-	./$(EXEC) $(ARGS)
+run: $(EXEC2)
+	./$(EXEC2) $(ARGS)
 
 valgrind: $(EXEC)
 	valgrind ./$(EXEC) $(ARGS)
