@@ -96,7 +96,7 @@ void LL_insert_ordered(LinkedList list, Pointer value, CompareFunc compare){
 		LL_insert_at_start(list,value);
 	}
 	else {
-		for(ListNode node = LL_list_first(list) ; node!= NULL ; node = LL_list_next(list,node)){
+		for(ListNode node = LL_first(list) ; node!= NULL ; node = LL_next(node)){
 			if(compare(value,LL_node_val(node))<=0){
 				break;
 			}
@@ -148,19 +148,19 @@ void LL_destroy(LinkedList list){
     free(list);
 }
 
-ListNode LL_list_first(LinkedList list){
+ListNode LL_first(LinkedList list){
     /* the next of dummy is the next */
     return list->dummy->next;
 }
 
-ListNode LL_list_last(LinkedList list){
+ListNode LL_last(LinkedList list){
     if(list->last == list->dummy)
         return NULL ;
     else return list->last ;
 
 }
 
-ListNode LL_list_next(LinkedList list, ListNode node){
+ListNode LL_next(ListNode node){
     if(node != NULL )
         return node->next;
     return NULL ;
@@ -170,7 +170,7 @@ ListNode LL_list_next(LinkedList list, ListNode node){
 ListNode LL_find_node(LinkedList list, Pointer value, CompareFunc compare){
     
     /* iterate through the list */
-    for (ListNode node = LL_list_first(list); node != NULL; node=node->next)
+    for (ListNode node = LL_first(list); node != NULL; node=node->next)
         if (compare(value, node->value) == 0)
             return node;
     

@@ -73,9 +73,9 @@ static void rehash(Map map) {
 	map->size = 0;
 
 	for (int i = 0; i < old_capacity; i++){
-		for(ListNode node = LL_list_first(old_array[i]) ;          // ξενικάμε από τον πρώτο κόμβο
+		for(ListNode node = LL_first(old_array[i]) ;          // ξενικάμε από τον πρώτο κόμβο
     	node != NULL;                          // μέχρι να φτάσουμε στο EOF
-    	node = LL_list_next(old_array[i], node)) { 
+    	node = LL_next(node)) { 
 			MapNode m = LL_node_val(node);
 			Pointer key = map_node_key(map,m);
 			Pointer value = map_node_value(map,m);
@@ -154,9 +154,9 @@ bool map_remove(Map map, Pointer key) {
 	MapNode m;
 
 	// Διατρέχουμε τη λίστα
-	for(ListNode node = LL_list_first(map->array[bucket]) ;          
+	for(ListNode node = LL_first(map->array[bucket]) ;          
     node != NULL;                          
-    node = LL_list_next(map->array[bucket], node)) {            
+    node = LL_next(node)) {            
 		m = LL_node_val(node);
 		int* node_key = map_node_key(map,m );  
 		
@@ -213,9 +213,9 @@ void map_destroy(Map map) {
 	// Διατρέχουμε όλες τις λίστες του πίνακα λιστών 
 	for (int i = 0 ; i< map->capacity ; i++){
 		// Και για κάθε κόμβο λίστας 
-		for(ListNode node = LL_list_first(map->array[i]) ;          
+		for(ListNode node = LL_first(map->array[i]) ;          
     	node != NULL;                          
-    	node = LL_list_next(map->array[i], node)) {   
+    	node = LL_next(node)) {   
 
 			// Φέρνουμε στη μνήμη τον αντίστοιχο MapNode που περιέχει        
 			MapNode m = LL_node_val(node);
@@ -242,7 +242,7 @@ void map_destroy(Map map) {
 
 MapNode map_first(Map map) {
 	if(map->array[0]!=NULL)
-		if(LL_list_first(map->array[0])!= NULL) return LL_node_val(LL_list_first(map->array[0]));
+		if(LL_first(map->array[0])!= NULL) return LL_node_val(LL_first(map->array[0]));
 	return MAP_EOF;
 }
 
@@ -258,9 +258,9 @@ MapNode map_next(Map map, MapNode node) {
 	// που περιέχει τον node του ορίσματος
 
 	ListNode lnode ;
-	for( lnode = LL_list_first(map->array[bucket]) ;          
+	for( lnode = LL_first(map->array[bucket]) ;          
     lnode != NULL;                          
-    lnode = LL_list_next(map->array[bucket], lnode)) {            
+    lnode = LL_next(lnode)) {            
 		MapNode m = (MapNode)LL_node_val(lnode); // παίρνουμε το περιεχόμενο του κόμβου λίστας
 		Pointer node_key = map_node_key(map,m );  		  // το κλειδί του κόμβου
 		Pointer node_value = map_node_value(map,m );	  //η τιμή του κόμβου
@@ -269,14 +269,14 @@ MapNode map_next(Map map, MapNode node) {
 	}
 
 	// Αν υπάρχει επόμενος του στη λίστα , τον επιστρέφω 
-	if(LL_list_next(map->array[bucket],lnode)!=NULL) 
-		return LL_node_val(LL_list_next(map->array[bucket],lnode));
+	if(LL_next(lnode)!=NULL) 
+		return LL_node_val(LL_next(lnode));
 	else{
 	// Αλλιώς πάω στο επόμενο bucket και επιστρέφω τον πρώτο κόμβο .	
 		bucket++;
 		if(bucket <= map->capacity ) {
-			if(LL_list_first(map->array[bucket])!=NULL)
-				return LL_node_val(LL_list_first(map->array[bucket]));
+			if(LL_first(map->array[bucket])!=NULL)
+				return LL_node_val(LL_first(map->array[bucket]));
 		}
 	}
 	// Διαφορετικά κάτι πήγε λάθος
@@ -297,9 +297,9 @@ MapNode map_find_node(Map map, Pointer key) {
 	bucket = map->hash_function(key) % map->capacity;
 	
 	// διατρέχω τη λίστα 
-	for(ListNode node = LL_list_first(map->array[bucket]) ;          // ξενικάμε από τον πρώτο κόμβο
+	for(ListNode node = LL_first(map->array[bucket]) ;          // ξενικάμε από τον πρώτο κόμβο
     node != NULL;                          // μέχρι να φτάσουμε στο EOF
-    node = LL_list_next(map->array[bucket], node)) {            // μετάβαση στον επόμενο κόμβο
+    node = LL_next(node)) {            // μετάβαση στον επόμενο κόμβο
 		MapNode m = LL_node_val(node);
 		Pointer node_key = map_node_key(map,m );  // η τιμή του συγκεκριμένου κόμβου
 		if(map->compare(key,node_key)==0) return m;

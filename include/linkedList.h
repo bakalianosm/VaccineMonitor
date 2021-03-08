@@ -38,9 +38,9 @@ Pointer LL_find(LinkedList list, Pointer value, CompareFunc compare);
 void LL_destroy(LinkedList list);
 
 /* list iteration */
-ListNode LL_list_first(LinkedList list);
-ListNode LL_list_last(LinkedList list);
-ListNode LL_list_next(LinkedList list, ListNode node);
+ListNode LL_first(LinkedList list);
+ListNode LL_last(LinkedList list);
+ListNode LL_next(ListNode node);
 
 /* Returns the first node that has "value" value based on  the compare function */
 ListNode LL_find_node(LinkedList list, Pointer value, CompareFunc compare);
