@@ -17,6 +17,8 @@ typedef struct list_node* ListNode;
 /* This function creates and empty Linked List */
 LinkedList LL_create(DestroyFunction destroy);
 
+/* This function is used to return the size of the Linked List */
+int LL_size(LinkedList list);
 /* This function is used to insert node with "value" in the
     start of the list */
 void LL_insert_at_start(LinkedList list, Pointer value);
@@ -24,13 +26,15 @@ void LL_insert_at_start(LinkedList list, Pointer value);
 /* This function is used to insert after a node in list */
 void LL_insert_after(LinkedList list, ListNode node, Pointer value);
 
+/* This function is used to create an ordered list */
+void LL_insert_ordered(LinkedList list, Pointer value, CompareFunction compare);
 /* This function is used to remove "node" node from the list */
 void LL_remove_next_item(LinkedList list, ListNode node);
 
 /* Returns the first node that has "value" value based on  the compare function */
 Pointer LL_find(LinkedList list, Pointer value, CompareFunction compare);
 
-/* Frees all the memory that the list has allocated */
+/* This function is used to free all the memory that the list has allocated */
 void LL_destroy(LinkedList list);
 
 /* list iteration */

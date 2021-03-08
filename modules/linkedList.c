@@ -45,7 +45,9 @@ LinkedList LL_create(DestroyFunction destroy){
     return list;
 }
 
-
+int LL_size(LinkedList list){
+    return list->size;
+}
 void LL_insert_at_start(LinkedList list, Pointer value){
 
     /* Create a new node */
@@ -56,12 +58,20 @@ void LL_insert_at_start(LinkedList list, Pointer value){
     newNode->next =  list->dummy->next;
     list->dummy->next = newNode;
 
+    
     /* Increment the list size */
+    if(list->size == 0 )
+        list->last = newNode;
+
     list->size++;
 }
 
 void LL_insert_after(LinkedList list, ListNode node, Pointer value){
-     /* Create a new node */
+    /* Create a new node */
+
+    if (node == NULL)
+        node=list->dummy;
+        
     ListNode newNode = malloc(sizeof(*newNode));
     newNode->value = value;
 
@@ -69,11 +79,32 @@ void LL_insert_after(LinkedList list, ListNode node, Pointer value){
     newNode->next =  node->next;
     node->next = newNode;
 
+    /* Check if the node is the last */
+    if(list->last == node)
+        list->last = newNode;
     /* Increment the list size */
     list->size++;
+
+
 }
 
+void LL_insert_ordered(LinkedList list, Pointer value, CompareFunction compare){
+	ListNode prev = NULL;
 
+	// if list is empty then we have to insert at the start
+	if(LL_size(list)==0) {
+		LL_insert_at_start(list,value);
+	}
+	else {
+		for(ListNode node = LL_list_first(list) ; node!= NULL ; node = LL_list_next(list,node)){
+			if(compare(value,LL_node_val(node))<=0){
+				break;
+			}
+			prev = node;
+		}
+		LL_insert_after(list,prev,value);
+	}
+}
 void LL_remove_next_item(LinkedList list, ListNode node){
 
     if (node == NULL)
