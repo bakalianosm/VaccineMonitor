@@ -55,7 +55,7 @@ else
 fi
 
 # input file
-INPUTFILE="inputfile.txt"
+INPUTFILE="misc/inputfile.txt"
 
 # Create the input file.
 # If exists a file with the INPUTFILE name, these instructions
@@ -112,10 +112,10 @@ do
         DAY=$((1+ $RANDOM %30 ))
         MONTH=$((1+ $RANDOM %12 ))
         YEAR=$((2015 + $RANDOM %7 ))
-        echo -e "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${VIRUS} ${ISVACCINATED} ${DAY}/${MONTH}/${YEAR} " >> ${INPUTFILE} 
+        echo -e "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${AGE} ${VIRUS} ${ISVACCINATED} ${DAY}/${MONTH}/${YEAR} " >> ${INPUTFILE} 
     else
         ISVACCINATED="NO"
-        echo -e "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${VIRUS} ${ISVACCINATED}" >> ${INPUTFILE} 
+        echo -e "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${AGE} ${VIRUS} ${ISVACCINATED}" >> ${INPUTFILE} 
     fi
 
     # Append the data on the input file
