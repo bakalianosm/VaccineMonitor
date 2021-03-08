@@ -21,11 +21,11 @@
 struct skip_list {
     int size;
     int layers;
-    DestroyFunction destroyItem;
+    DestroyFunc destroyItem;
     LinkedList *listArray;
 };
 
-SkipList SL_create(int estimatedSize, DestroyFunction destroy){
+SkipList SL_create(int estimatedSize, DestroyFunc destroy){
     
     /* allocate memory to store the skip list */
     SkipList skiplist = malloc(sizeof(*skiplist));
@@ -52,7 +52,7 @@ int SL_layers(SkipList skiplist){
     return skiplist->layers;
 }
 
-void SL_insert(SkipList skiplist, Pointer value, CompareFunction compare){
+void SL_insert(SkipList skiplist, Pointer value, CompareFunc compare){
     
 }
 
