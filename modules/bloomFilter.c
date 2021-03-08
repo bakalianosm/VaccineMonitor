@@ -82,8 +82,6 @@ int bf_search(BloomFilter bloomfilter, unsigned char* str){
 
         if(bit==0)
             return 0;
-
-        return 1;
     }
 
     return 1;
