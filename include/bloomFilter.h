@@ -13,7 +13,23 @@
 #include "common.h"
 
 typedef struct bloom_filter* BloomFilter;
-typedef uint (*HashFunc)(Pointer);
 
 /* Initializes and creates an empty Bloom Filter */
-BloomFilter bf_create(int size, HashFunc HF1, HashFunc HF2, HashFunc HF3);
+BloomFilter bf_create(int k, int size, BF_HashFunc hashfunction);
+
+/* Returns the number of elements that are in the Bloom Filter */
+int bf_size(BloomFilter bloomfilter);
+
+/* Retunrns the value of K */
+int bf_numK(BloomFilter bloomfilter);
+
+/* Inserts an element into the Bloom Filter */
+void bf_insert(BloomFilter bloomfilter, unsigned char* str);
+
+/* Searches for an element in the Bloom Filter */
+int bf_search(BloomFilter bloomfilter, unsigned char* str);
+
+/* Destroys an existing Bloom Filter */
+void bf_destroy(BloomFilter bloomfilter);
+
+ulong hash_i(unsigned char *str, unsigned int i);

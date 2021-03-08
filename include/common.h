@@ -5,17 +5,17 @@
 typedef void* Pointer;
 typedef char* date;
 typedef unsigned int uint;
+typedef unsigned long ulong;
 
-typedef int (*CompareFunction)(Pointer a, Pointer b);
-typedef void (*DestroyFunction)(Pointer);
 
 typedef int (*CompareFunc)(Pointer a, Pointer b);
 typedef void (*DestroyFunc)(Pointer value);
 
+typedef unsigned long (*BF_HashFunc)(unsigned char *str, unsigned int i);
 
 struct record {
     int ID;
-    char *fistName;
+    char *firstName;
     char *lastName;
     char *country;
     int age;
