@@ -22,7 +22,7 @@ struct linked_list {
     int size;
     ListNode dummy;
     ListNode last;
-    DestroyFunction destroyValue;
+    DestroyFunc destroyValue;
 };
 
 struct list_node {
@@ -30,7 +30,7 @@ struct list_node {
     ListNode next;
 };
 
-LinkedList LL_create(DestroyFunction destroy){ 
+LinkedList LL_create(DestroyFunc destroy){ 
     LinkedList list= malloc(sizeof(*list));
     list->size = 0;
     list->destroyValue = destroy;
@@ -88,7 +88,7 @@ void LL_insert_after(LinkedList list, ListNode node, Pointer value){
 
 }
 
-void LL_insert_ordered(LinkedList list, Pointer value, CompareFunction compare){
+void LL_insert_ordered(LinkedList list, Pointer value, CompareFunc compare){
 	ListNode prev = NULL;
 
 	// if list is empty then we have to insert at the start
@@ -127,7 +127,7 @@ void LL_remove_next_item(LinkedList list, ListNode node){
 
 }
 
-Pointer LL_find(LinkedList list, Pointer value, CompareFunction compare){
+Pointer LL_find(LinkedList list, Pointer value, CompareFunc compare){
     ListNode node = LL_find_node(list,value,compare);
     return node == NULL ? NULL : node->value;
 }
@@ -167,7 +167,7 @@ ListNode LL_list_next(LinkedList list, ListNode node){
 
 }
 
-ListNode LL_find_node(LinkedList list, Pointer value, CompareFunction compare){
+ListNode LL_find_node(LinkedList list, Pointer value, CompareFunc compare){
     
     /* iterate through the list */
     for (ListNode node = LL_list_first(list); node != NULL; node=node->next)
