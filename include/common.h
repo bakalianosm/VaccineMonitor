@@ -20,7 +20,7 @@ struct record {
     char *country;
     int age;
     char *virusName;
-    bool isVaccinated;
+    char* isVaccinated;
     date dateVaccinated;
 };
 
