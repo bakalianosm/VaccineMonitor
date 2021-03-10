@@ -1,25 +1,27 @@
 
 
 
+/* --------------------------------------------------------
+ * ----------------- VACCINE MONITOR ----------------------
+ * ------------------ IMPLEMENTATION ----------------------
+ * --------------------------------------------------------
+ */
+
+#define K_FOR_BF 16
+/* ----------- System header files  --------- */
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 
+/* -------- User-defined header files ------- */
 #include "common.h"
+#include "map.h"
 #include "skipList.h"
 #include "linkedList.h"
 #include "bloomFilter.h"
 #include "vaccineMonitor.h"
 #include "generalFunctions.h"
-
-
-int* create_int(int value) {
-	int* pointer = malloc(sizeof(int));	// δέσμευση μνήμης
-	*pointer = value;					// αντιγραφή του value στον νέο ακέραιο
-	return pointer;
-}
-
 
 
 int main(int argc, char *argv[]){
@@ -39,36 +41,59 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    printf("Arguments are [%s] [%d]\n",recordFile,bloomSize);
 
+    FILE* input_fp ;
+    if (recordFile != NULL) input_fp = fopen(recordFile, "r");
+
+    if (input_fp == NULL){
+        perror("Error opening record file ");
+    }
     
-    LinkedList list = LL_create(free);
+    /* Initialize the bloom fiter */
+    BloomFilter bloomFilter = bf_create(K_FOR_BF, bloomSize, hash_i);
 
-    int *p1 = create_int(8);
-    int *p2 = create_int(15);
-    int *p3 = create_int(3);
-    LL_insert_at_start(list,p1);
-    LL_insert_at_start(list,p2);
-    LL_insert_at_start(list,p3);
+    Map map = map_create(compare_records,record_destroy_key, record_destroy_value );
+    map_set_hash_function(map,hash_int);
+
+    /* string buffer for each line */
+    char buffer[256];
+
+    /* Values to be assigned */
+    while( fgets(buffer,sizeof(buffer),input_fp) != NULL ){
+        int parsedID = -1 ;
+        char *parsedFirstName = NULL; 
+        char *parsedLastName = NULL ;
+        char *parsedCountry = NULL ;
+        int parsedAge = -1 ;
+        char *parsedVirusName = NULL ;
+        char *parsedIsVaccinated = NULL ;
+        char *parsedDateVaccinated = NULL ;
+
+        /* this array represents an array of the values of input line */
+        char *array[9];
+
+        /* parse the values from the buffer and make an array of these */
+        parseValues(buffer,array);
+
+        /* assign the values of the array to the correct variables and validate them */
+        assignValues(array,&parsedID, &parsedFirstName, &parsedLastName, &parsedCountry, &parsedAge, &parsedVirusName, &parsedIsVaccinated, &parsedDateVaccinated);
+    
+        /* create a new record */
+        Record citizen = malloc(sizeof(*citizen));
+
+        /* and initialize with the parsed values */
+        citizen->ID = parsedID;
+        citizen->firstName = strdup(parsedFirstName);
+        citizen->lastName = strdup(parsedLastName);
+        citizen->country = strdup(parsedCountry);
+        citizen->age = parsedAge;
+        citizen->virusName = parsedVirusName;
+        citizen->isVaccinated = parsedIsVaccinated;
+        citizen->dateVaccinated = parsedDateVaccinated;
 
 
-    ListNode tempNode;
-    for(ListNode node = LL_list_first(list) ; node != NULL ; node = LL_list_next(list,node)){
-        int *val = LL_node_val(node);
-        if(*val==15) tempNode = node;
-        printf("node val = %d\n", *val);
+
     }
 
-    printf("Inserting 16\n");
-    // insert next of 15
-    int *p4 = create_int(16);
-    LL_insert_after(list,tempNode,p4);
 
-    for(ListNode node = LL_list_first(list) ; node != NULL ; node = LL_list_next(list,node)){
-        int *val = LL_node_val(node);
-        if(*val==15) tempNode = node;
-        printf("node val = %d\n", *val);
-    }
-
-    LL_destroy(list);
 }
