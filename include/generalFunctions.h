@@ -11,6 +11,13 @@
 #pragma once
 #include "common.h"
 
+#define NO_ERROR 0
+#define AGE_ERR -1
+#define VACCINATED_DAY_ERR -2
+#define NOT_GIVEN_DATE_ERR -3
+/* creates a pointer to the given integer value */
+int* create_int(int value);
+
 /* A function that is used to compare two records */
 int compare_records(Pointer a, Pointer b);
 
@@ -25,4 +32,10 @@ void record_destroy_value(Pointer rec);
 void parseValues(char buffer[], char* array[]);
 
 /* A function that set the values of records' data array to values */
-void assignValues(char* valuesArray[],int *ID,   char **firstName, char **lastName, char **country, int *age, char **virusName, char **isVaccinated, date* dateVaccinated);
+ERR_CHK assignValues(char* valuesArray[],int *ID,   char **firstName, char **lastName, char **country, int *age, char **virusName, char **isVaccinated, date* dateVaccinated);
+
+/* Creates, initializes and returns a record with the given values */
+Record initializeCitizen(int ID,   char *firstName, char *lastName, char *country, int age, char *virusName, char *isVaccinated, date dateVaccinated);
+
+/* Prints the data of a citizen */
+void printCitizen(Record citizen);

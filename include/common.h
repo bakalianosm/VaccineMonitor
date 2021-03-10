@@ -6,7 +6,7 @@ typedef void* Pointer;
 typedef char* date;
 typedef unsigned int uint;
 typedef unsigned long ulong;
-
+typedef int ERR_CHK;
 
 typedef int (*CompareFunc)(Pointer a, Pointer b);
 typedef void (*DestroyFunc)(Pointer value);
