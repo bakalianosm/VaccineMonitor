@@ -32,4 +32,5 @@ int bf_search(BloomFilter bloomfilter, unsigned char* str);
 /* Destroys an existing Bloom Filter */
 void bf_destroy(BloomFilter bloomfilter);
 
+/* Hash function that will be used */
 ulong hash_i(unsigned char *str, unsigned int i);
