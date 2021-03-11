@@ -112,10 +112,10 @@ do
         DAY=$((1+ $RANDOM %30 ))
         MONTH=$((1+ $RANDOM %12 ))
         YEAR=$((2015 + $RANDOM %7 ))
-        echo -e "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${AGE} ${VIRUS} ${ISVACCINATED} ${DAY}/${MONTH}/${YEAR} " >> ${INPUTFILE} 
+        echo "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${AGE} ${VIRUS} ${ISVACCINATED} ${DAY}/${MONTH}/${YEAR}" >> ${INPUTFILE} 
     else
         ISVACCINATED="NO"
-        echo -e "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${AGE} ${VIRUS} ${ISVACCINATED}" >> ${INPUTFILE} 
+        echo "${ID} ${NAME} ${SURNAME} ${COUNTRY} ${AGE} ${VIRUS} ${ISVACCINATED}" >> ${INPUTFILE} 
     fi
 
     # Append the data on the input file
