@@ -17,8 +17,11 @@ typedef struct bloom_filter* BloomFilter;
 /* Initializes and creates an empty Bloom Filter */
 BloomFilter bf_create(int k, int size, BF_HashFunc hashfunction);
 
-/* Returns the number of elements that are in the Bloom Filter */
+/* Returns the size of the Bloom Filter */
 int bf_size(BloomFilter bloomfilter);
+
+/* Returns the number of elements that are in the Bloom Filter */
+int bf_items(BloomFilter bloomfilter);
 
 /* Retunrns the value of K */
 int bf_numK(BloomFilter bloomfilter);

@@ -18,6 +18,7 @@
 struct bloom_filter {
     int numK;
     int size;
+    int sizeOfItems;
     char *array;
     BF_HashFunc HF;
    
@@ -28,6 +29,7 @@ BloomFilter bf_create(int k, int size, BF_HashFunc hashfunction){
 
     bloomfilter->numK = k;
     bloomfilter->size = size;
+    bloomfilter->sizeOfItems = 0;
     bloomfilter->array = malloc(size*sizeof(char));
     
     /* Initialize array with 0 */
@@ -41,6 +43,10 @@ BloomFilter bf_create(int k, int size, BF_HashFunc hashfunction){
 
 int bf_size(BloomFilter bloomfilter){
     return bloomfilter->size;
+}
+
+int bf_items(BloomFilter bloomfilter){
+    return bloomfilter->sizeOfItems;
 }
 
 int bf_numK(BloomFilter bloomfilter){
@@ -61,7 +67,7 @@ void bf_insert(BloomFilter bloomfilter, unsigned char* str){
         bloomfilter->array[byte] |= 1UL << bitOnByte;
     }
 
-    bloomfilter->size++;
+    bloomfilter->sizeOfItems++;
 }
 
 int bf_search(BloomFilter bloomfilter, unsigned char* str){
