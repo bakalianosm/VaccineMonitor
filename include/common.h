@@ -1,5 +1,21 @@
 #pragma once
 
+/* Buffer size for the whole application */
+#define BUFFER_SIZE 256
+
+/* User input constants */
+#define USR_EXIT 0
+#define INPT_1 1
+#define INPT_2 2
+#define INPT_3 3
+#define INPT_4 4
+#define INPT_5 5
+#define INPT_6 6
+#define INPT_7 7
+#define INPT_8 8
+#define INVALID_INPT 10
+#define ARG_ERR 11
+
 #include <stdbool.h>
 
 typedef void* Pointer;
@@ -7,7 +23,7 @@ typedef char* date;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef int ERR_CHK;
-
+typedef int USR_INPT;
 typedef int (*CompareFunc)(Pointer a, Pointer b);
 typedef void (*DestroyFunc)(Pointer value);
 
