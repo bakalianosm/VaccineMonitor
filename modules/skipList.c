@@ -12,17 +12,30 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-
+#include <string.h>
+#include <time.h>
 /* -------- User-defined header files ------- */
 #include "common.h"
 #include "skipList.h"
 #include "linkedList.h"
 
+
+#define INSERT 1
+#define NOT_INSERT 0
 struct skip_list {
+  
     int size;
     int layers;
+    LinkedList bottomList;
+    LinkedList* upperLists;
     DestroyFunc destroyItem;
-    LinkedList *listArray;
+    
+};
+
+struct upper_node {
+    UpperNode up;
+    UpperNode next;
+    ListNode down;
 };
 
 SkipList SL_create(int estimatedSize, DestroyFunc destroy){
@@ -35,12 +48,9 @@ SkipList SL_create(int estimatedSize, DestroyFunc destroy){
     skiplist->layers = log2((double)estimatedSize);
     
     /* after we computed the number of layers we can initialize lists*/
-    skiplist->listArray = malloc(skiplist->layers * sizeof(LinkedList));
-    for (int i = 0 ; i < skiplist->layers ; i++){
-        skiplist->listArray[i] = LL_create(free);
-    }
-
+    
     skiplist->destroyItem = destroy;
+
     return skiplist;
 }
 
@@ -53,21 +63,14 @@ int SL_layers(SkipList skiplist){
 }
 
 void SL_insert(SkipList skiplist, Pointer value, CompareFunc compare){
-    
+
 }
 
+void SL_print(SkipList skiplist){
+    return;
+}
 void SL_destroy(SkipList skiplist){
-
-    /* iterate through all the lists */
-    for (int i = 0 ; i < skiplist->layers ; i++){
-        LL_destroy(skiplist->listArray[i]);
-    }
-
-    /* free the listArray pointer */
-    free(skiplist->listArray);
-
-    /* free the struct skipList */
-    free(skiplist);
+    return;
 }
 
 
