@@ -76,7 +76,7 @@ void destroy_virus_bf(Pointer rec){
 }
 
 void parseValues(char buffer[], char* array[]){
-
+  
     int i = 0;
     array[i] = strtok(buffer, " ");
     while(array[i] !=NULL ){
@@ -97,9 +97,9 @@ ERR_CHK assignValues(char* valuesArray[],int *ID,   char **firstName, char **las
     *virusName = strdup(valuesArray[5]);
     *isVaccinated = strdup(valuesArray[6]);
 
-    if(strcmp(*isVaccinated, "NO\n")==0){
-        *isVaccinated = strdup("NO");
-    }
+    // if(strcmp(*isVaccinated, "NO\n")==0){
+    //     *isVaccinated = strdup("NO");
+    // }
 
     if (valuesArray[7] != NULL){
         *dateVaccinated = strdup(valuesArray[7]);
@@ -158,7 +158,7 @@ void printCitizen(Record citizen){
         printf("%d %s %s %s %d %s %s %s", citizen->ID, citizen->firstName, citizen->lastName, citizen->country, citizen->age, citizen->virusName, citizen->isVaccinated, citizen->dateVaccinated);
     }
     else {
-        printf("%d %s %s %s %d %s %s \n", citizen->ID, citizen->firstName, citizen->lastName, citizen->country, citizen->age, citizen->virusName, citizen->isVaccinated);
+        printf("%d %s %s %s %d %s %s", citizen->ID, citizen->firstName, citizen->lastName, citizen->country, citizen->age, citizen->virusName, citizen->isVaccinated);
     }
 }
 
