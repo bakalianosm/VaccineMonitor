@@ -1,7 +1,6 @@
 
 
 
-
 /* -------------------------------------------------------
  * --------------- GENERAL FUNCTIONS ---------------------
  * ------------------ HEADER FILE ------------------------
@@ -10,6 +9,7 @@
 
 #pragma once
 #include "common.h"
+#include "map.h"
 
 #define NO_ERROR 0
 #define AGE_ERR -1
@@ -25,8 +25,11 @@ void printGreen(const char* sentence);
 /* creates a pointer to the given integer value */
 int* create_int(int value);
 
-/* A function that is used to compare two records */
-int compare_records(Pointer a, Pointer b);
+/* A function that is used to compare two hash structs  */
+int compare_keys(Pointer a, Pointer b);
+
+/* A function that is used to compare citizens */
+int compare_values(Pointer a, Pointer b);
 
 /* A function that is used to destroy a key of  a Citizen Map */
 void record_destroy_key(Pointer value);
@@ -50,6 +53,9 @@ void parseValues(char buffer[], char* array[]);
 
 /* A function that set the values of records' data array to values */
 ERR_CHK assignValues(char* valuesArray[],int *ID,   char **firstName, char **lastName, char **country, int *age, char **virusName, char **isVaccinated, date* dateVaccinated);
+
+/* Creates a struct that is the values that gonna be hashed */
+hashRec initializeHashKey(int ID,char* virus);
 
 /* Creates, initializes and returns a record with the given values */
 Record initializeCitizen(int ID,   char *firstName, char *lastName, char *country, int age, char *virusName, char *isVaccinated, date dateVaccinated);

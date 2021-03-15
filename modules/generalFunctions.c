@@ -17,6 +17,14 @@
 #include "bloomFilter.h"
 #include "common.h"
 
+
+
+uint hash_vaccine(Pointer value){
+    uint first = hash_int(((hashRec)value)->ID);
+    uint last = hash_string(((hashRec)value)->virus);
+	return first + last;
+}
+
 void printRed(const char* sentence){
     if(sentence != NULL){
         printf("\033[1;31m");
@@ -38,13 +46,34 @@ int* create_int(int value){
     return p;
 
 }
-int compare_records(Pointer a, Pointer b){
-    return (((Record)a)->ID - ((Record)b)->ID);
+int compare_keys(Pointer a, Pointer b){
+    hashRec first = (hashRec)a;
+    hashRec second = (hashRec)b;
+
+    if ( (*(int*)first->ID == *(int*)second->ID) && (strcmp(first->virus, second->virus) == 0) )
+        return 0;
+    else if((*(int*)first->ID == *(int*)second->ID))
+        return 0;
+    // if ( (((hashRec)a)->ID == ((Record)b)->ID ) &&  (strcmp(((Record)a)->virusName, ((Record)b)->virusName) != 0) )
+    //     return 0;
+    // else if( (((Record)a)->ID == ((Record)b)->ID) &&  (strcmp(((Record)a)->virusName, ((Record)b)->virusName) == 0) && (strcmp(((Record)a)->isVaccinated, ((Record)b)->isVaccinated) != 0))
+    //     return 0;
+    else
+        return 1;
+
+    // return ((Record)a)->ID - ((Record)b)->ID ;
 
 }
 
+int compare_values(Pointer a, Pointer b){
+    return ((Record)a)->ID -((Record)b)->ID ;
+}
 void record_destroy_key(Pointer value){
-    free((int*)value);
+    /* free the struct container */
+    free(((hashRec)value)->ID);
+
+    /* free the whole struct */
+    free((hashRec)value);
 }
 
 void record_destroy_value(Pointer rec){
@@ -67,7 +96,7 @@ int compare_viruses(Pointer a, Pointer b){
 }
 
 void destroy_virus(Pointer value){
-    // free((char*)value);
+    free(value);
 }
 
 /* A function that is used to destroy a bloom filter from a map */
@@ -131,7 +160,16 @@ ERR_CHK assignValues(char* valuesArray[],int *ID,   char **firstName, char **las
 
     return ERRNO;
 }
+hashRec initializeHashKey(int ID, char* virus){
+    hashRec hashrec = malloc(sizeof(*hashrec));
 
+    hashrec->ID = create_int(ID);
+    hashrec->virus = virus;
+
+    return hashrec;
+
+
+}
 Record initializeCitizen(int ID,   char *firstName, char *lastName, char *country, int age, char *virusName, char *isVaccinated, date dateVaccinated){
     Record citizen = malloc(sizeof(*citizen));
 
@@ -283,5 +321,6 @@ USR_INPT readUserInput(){
         else return INVALID_INPT;
     }
     
+    return 1;
 }
 
