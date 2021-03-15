@@ -41,3 +41,10 @@ struct record {
 };
 
 typedef struct record* Record;
+
+struct hash_rec {
+    int* ID;
+    char* virus;
+};
+
+typedef struct hash_rec* hashRec;
