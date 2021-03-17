@@ -33,7 +33,7 @@ void SL_print(SkipList skiplist, PrintFunc print);
 Pointer SL_find(SkipList skiplist, Pointer key, CompareFunc compare);
 
 /* Removes node with "key" key if exists */
-void SL_remove(SkipList skiplist, Pointer key);
+void SL_remove(SkipList skiplist, Pointer key,CompareFunc compare);
 
 /* This function is used to free all the memory that the list has allocated */
 void SL_destroy(SkipList skiplist);

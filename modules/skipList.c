@@ -57,6 +57,10 @@ SkipList SL_create(int maxLevel, DestroyFunc destroy_key, DestroyFunc destroy_va
         header->next[i] = NULL;
     }
 
+
+    skiplist->destroy_key = destroy_key;
+    skiplist->destroy_value = destroy_value;
+
     skiplist->header = header;
     return skiplist;
 }
@@ -113,15 +117,16 @@ void SL_insert(SkipList skiplist, Pointer key, Pointer value,CompareFunc compare
         update[i] = x;
     }
     
-
-    if(x->next[1]!=NULL){
-        if (x->next[1]->key!=NULL){
-            if (compare(x->next[1]->key,key)== 0 ){
-                x->next[1]->value = value;
-                return ;
+    if(x==NULL){ // borei na to bvgalo
+        if(x->next[0]!=NULL){
+            if (x->next[0]->key!=NULL){
+                if (compare(x->next[0]->key,key)== 0 ){
+                    x->next[0]->value = value;
+                    return ;
+                }
             }
         }
-    }
+    } // mporei na to vgalo
     else {
         int level = randomLevel(skiplist);
 
@@ -130,6 +135,7 @@ void SL_insert(SkipList skiplist, Pointer key, Pointer value,CompareFunc compare
                 update[i] = skiplist->header;
             }
             skiplist->curLevel = level;
+            
         }
 
         x = malloc(sizeof(*x));
@@ -214,11 +220,35 @@ Pointer SL_find(SkipList skiplist, Pointer key, CompareFunc compare){
 
 }
 
-void SL_remove(SkipList skiplist, Pointer key){
-    
+void SL_remove(SkipList skiplist, Pointer key, CompareFunc compare){
+
+return ;    
+ 
 }
 void SL_destroy(SkipList skiplist){
-    return;
+
+    skipListNode node = skiplist->header;
+    skipListNode nextNode = NULL;
+
+    while (node != NULL){
+        nextNode = node->next[1];
+        if (node != skiplist->header){    
+            if (skiplist->destroy_key != NULL){
+                skiplist->destroy_key(node->key);
+            }
+            if (skiplist->destroy_value != NULL){
+                skiplist->destroy_value(node->value);
+            }
+        }
+
+        if (node->next != NULL) free(node->next);
+        if (node!= NULL)  free(node);
+        node = nextNode;
+    }
+    
+
+   
+    free(skiplist);
 }
 
 
