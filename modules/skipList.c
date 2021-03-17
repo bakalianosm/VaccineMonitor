@@ -51,7 +51,9 @@ SkipList SL_create(int maxLevel, DestroyFunc destroy_key, DestroyFunc destroy_va
     
     skipListNode header = malloc(sizeof(*header));
     header->next = malloc( (maxLevel+1) * sizeof(*(header->next)));
-
+    
+    // if (header == NULL ) return NULL;
+    // if (header->next == NULL ) return NULL;
 
     for(int i = 0 ; i<= skiplist->maxLevel ; i++){
         header->next[i] = NULL;
