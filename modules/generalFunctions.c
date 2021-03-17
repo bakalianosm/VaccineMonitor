@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /* -------- User-defined header files ------- */
 #include "generalFunctions.h"
@@ -105,7 +106,7 @@ void destroy_virus_bf(Pointer rec){
 }
 
 void parseValues(char buffer[], char* array[]){
-  
+    
     int i = 0;
     array[i] = strtok(buffer, " ");
     while(array[i] !=NULL ){
@@ -216,18 +217,70 @@ int countArgs(char* str) {
   
 }
 
-USR_INPT readUserInput(){
+int checkID(char str[]){
+    
+    int length = strlen(str);
+
+    if (length > 4 ) return 0;
+    for (int i = 0 ; i < length ; i++){
+        if(!isdigit(str[i]))
+            return 0;
+    }
+
+    return 1;
+}
+
+void removeChar(char *str, char toRem){
+    char *src, *dst;
+
+    for(src = dst = str; *src !='\0' ; src++){
+        *dst = *src;
+        if (*dst != toRem) dst++;
+    }
+    *dst = '\0';
+}
+
+
+USR_INPT readUserInput(Map bfMap){
+    printf("map size %d\n",map_size(bfMap));
     char buf[BUFFER_SIZE];
+    char str[BUFFER_SIZE];
     while(fgets(buf, BUFFER_SIZE, stdin) != 0){
         int numOfArguments = countArgs(buf) - 1;
+        strcpy(str,buf);
         char *buffer = strtok(buf, " ");
-        
+        int *arr[numOfArguments+3];
         if(strcmp("exit\n", buffer) ==0){
             return USR_EXIT;
         }
         else if(strcmp("vaccineStatusBloom", buffer) ==0){
             if (numOfArguments == 2){
-                printf("Given arguments are %d \n",numOfArguments);
+                
+                parseValues(str, arr);
+                if (!checkID(arr[1])) return ARG_ERR; /* invalid id. either alpharethmetic either length >4 */
+
+                char* virus = strdup(arr[2]);
+                removeChar(virus,'\n');
+                unsigned char *IDstring = (unsigned char*)strdup(arr[1]);
+                MapNode m = MAP_EOF;
+                
+                m = map_find_node(bfMap, virus);
+
+                if(m != MAP_EOF){
+                    BloomFilter virusBF = (BloomFilter)map_node_value(bfMap, m);
+                    if(bf_search(virusBF, IDstring)){
+                        printf("MAYBE\n");
+                    }
+                    else{
+                        printf("NOT VACCINATED\n");
+                    }
+
+                }
+                else {
+                    printRed("Sorry no BF for this virus. \n");
+                }
+
+
                 return INPT_1;
             }
             else{

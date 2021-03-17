@@ -8,6 +8,8 @@
  */
 
 #pragma once
+
+#include "bloomFilter.h"
 #include "common.h"
 #include "map.h"
 
@@ -67,4 +69,4 @@ void printCitizen(Record citizen);
 int countArgs(char* str);
 
 /* Read user's options */
-USR_INPT readUserInput();
+USR_INPT readUserInput(Map bfMap);
