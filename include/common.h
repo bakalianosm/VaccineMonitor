@@ -26,6 +26,7 @@ typedef int ERR_CHK;
 typedef int USR_INPT;
 typedef int (*CompareFunc)(Pointer a, Pointer b);
 typedef void (*DestroyFunc)(Pointer value);
+typedef void (*PrintFunc)(Pointer value);
 
 typedef unsigned long (*BF_HashFunc)(unsigned char *str, unsigned int i);
 
