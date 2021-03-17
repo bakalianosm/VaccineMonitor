@@ -132,6 +132,7 @@ int main(int argc, char *argv[]){
                 bf_insert(virusBloomFilter, idString);
                 printf("%s inserted in BF for %s\n",idString, citizen->virusName);
                 /* insert the bloomFilter in the map */
+                
                 map_insert(bloomFilterMap, strdup(citizen->virusName), virusBloomFilter);
                 
             }
@@ -153,56 +154,49 @@ int main(int argc, char *argv[]){
     }
 
     // /* read user's input from keyboard */
-    // USR_INPT input;
-    // while ( ( input = readUserInput()) != USR_EXIT){
-    //     switch (input){
-    //         case INPT_1:
-    //             printGreen("vaccineStatusBloom\n");
-    //             break;
+    USR_INPT input;
+    while ( ( input = readUserInput(bloomFilterMap)) != USR_EXIT){
+        switch (input){
+            case INPT_1:
+                printGreen("vaccineStatusBloom\n");
+                break;
             
-    //         case INPT_2:
-    //             printGreen("vaccineStatus\n");
-    //             break;
+            case INPT_2:
+                printGreen("vaccineStatus\n");
+                break;
                 
-    //         case INPT_3:
-    //             printGreen("populationStatus\n");
-    //             break;
+            case INPT_3:
+                printGreen("populationStatus\n");
+                break;
     
-    //         case INPT_4:
-    //             printGreen("popStatusbyAge\n");
-    //             break;
+            case INPT_4:
+                printGreen("popStatusbyAge\n");
+                break;
 
-    //         case INPT_5:
-    //             printGreen("insertCitizenRecord\n");
-    //             break;  
+            case INPT_5:
+                printGreen("insertCitizenRecord\n");
+                break;  
 
-    //         case INPT_6:
-    //             printGreen("vaccinateNow\n");
-    //             break;
+            case INPT_6:
+                printGreen("vaccinateNow\n");
+                break;
                     
-    //         case INPT_7:
-    //             printGreen("list-nonVaccinated-Persons\n");
-    //             break;
+            case INPT_7:
+                printGreen("list-nonVaccinated-Persons\n");
+                break;
                     
-    //         case INVALID_INPT:
-    //             printRed("Please give a valid instruction\n");
-    //             break;
-    //         case ARG_ERR:
-    //             printRed("Please give valid arguments\n");
+            case INVALID_INPT:
+                printRed("Please give a valid instruction\n");
+                break;
+            case ARG_ERR:
+                printRed("Please give valid arguments\n");
                     
-    //     }
-    // }
+        }
+    }
     printf("Record inserted : %d\n",map_size(citizenMap));
     printf("Bloomfilters created : %d\n",map_size(bloomFilterMap));
     
 
-    // for (MapNode node = map_first(citizenMap); node != MAP_EOF; node = map_next(citizenMap, node)) {
-    //     printf("mpike");
-    //     hashRec key = map_node_key(citizenMap,node);
-    //     Record value = map_node_value(citizenMap,node);
-    //     printf("edo");
-    //     printCitizen(value);
-    // }
 
     fclose(input_fp);
     free(recordFile);
