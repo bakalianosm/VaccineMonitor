@@ -9,7 +9,7 @@
 
 /* ---------------- Create Constants -------- */
 #define K_FOR_BF 16
-
+#define MAX_SKIPLIST_LEVEL 6
 
 /* ----------- System header files  --------- */
 #include <stdio.h>
@@ -23,24 +23,24 @@
 #include "skipList.h"
 #include "linkedList.h"
 #include "bloomFilter.h"
-#include "monitorChoices.h"
+
 #include "vaccineMonitor.h"
 #include "generalFunctions.h"
 
 
 int main(int argc, char *argv[]){
-    
+
 
     /* ---------------------------- READ COMMAND LINE ARGUMENTS ---------------------------- */
     if (argc != 5) exit(EXIT_FAILURE);
     printf("Hello from Vaccine Monitor\n");
-    
+
     /* Arguments parsing */
     char *recordFile;
     int bloomSize;
     if( (strcmp(argv[1], "-c")==0) && (strcmp(argv[3], "-b")==0) ){
             recordFile = strdup(argv[2]);
-            bloomSize = atoi(argv[4]);      
+            bloomSize = atoi(argv[4]);
         }
     else{
         printf("Invalid command line sequence.Exiting...\n");
@@ -58,10 +58,10 @@ int main(int argc, char *argv[]){
     if (input_fp == NULL){
         perror("Error opening record file ");
     }
-    
+
 
     /* --------------------------------- DATA STRUCTURES INITIALIZATION ----------------------------- */
-    
+
 
     /* Initialize the Citizen Map */
     Map citizenMap = map_create(compare_keys,record_destroy_key, record_destroy_value );
@@ -71,6 +71,17 @@ int main(int argc, char *argv[]){
     Map bloomFilterMap =  map_create(compare_viruses, destroy_virus, destroy_virus_bf);
     map_set_hash_function(bloomFilterMap,hash_string);
 
+
+    /* Initialize the VACCINATED Skip List Map */
+    Map vaccSkipListMap = map_create(compare_viruses, free, destroy_vacc_skip_list);
+    map_set_hash_function(vaccSkipListMap, hash_string);
+
+
+    /* Initialize the NOT VACCINATED Skip List Map */
+    Map notVaccSkipListMap = map_create(compare_viruses, free, destroy_vacc_skip_list);
+    map_set_hash_function(notVaccSkipListMap, hash_string);
+
+
     /* string buffer for each line */
     char buffer[BUFFER_SIZE];
 
@@ -79,7 +90,7 @@ int main(int argc, char *argv[]){
     while( fgets(buffer,sizeof(buffer),input_fp) != NULL ){
 
         int parsedID = -1 ;
-        char *parsedFirstName = NULL; 
+        char *parsedFirstName = NULL;
         char *parsedLastName = NULL ;
         char *parsedCountry = NULL ;
         int parsedAge = -1 ;
@@ -88,17 +99,17 @@ int main(int argc, char *argv[]){
         char *parsedDateVaccinated = NULL ;
 
         /* this array represents an array of the values of input line */
-        
+
 
         /* parse the values from the buffer and make an array of these */
         parseValues(buffer,array);
 
         /* assign the values of the array to the correct variables and validate them */
         ERR_CHK error = assignValues(array,&parsedID, &parsedFirstName, &parsedLastName, &parsedCountry, &parsedAge, &parsedVirusName, &parsedIsVaccinated, &parsedDateVaccinated);
-        
+
         /* if the above function return an error code , we have to ignore this record */
         if(error != NO_ERROR) continue;
-        
+
         /* create a new record */
         Record citizen = initializeCitizen(parsedID, parsedFirstName, parsedLastName, parsedCountry, parsedAge, parsedVirusName, parsedIsVaccinated, parsedDateVaccinated);
         /* the hash will be a combination of ID and virus */
@@ -106,7 +117,11 @@ int main(int argc, char *argv[]){
 
         map_insert(citizenMap, hashKey, citizen);
 
-        if(strcmp(citizen->isVaccinated,"YES")==0){
+        if(strcmp(citizen->isVaccinated,"YES")==0 ){
+
+            /* ----------------- VACCINATED RECORD INSERT ON THE BLOOM FILTER FOR THIS VIRUS --------------------- */
+
+
             MapNode m = MAP_EOF;
             BloomFilter virusBloomFilter;
 
@@ -120,27 +135,93 @@ int main(int argc, char *argv[]){
                 virusBloomFilter = (BloomFilter)map_node_value(bloomFilterMap, m);
                 if (virusBloomFilter == NULL) { printf("Error!\n") ; exit(EXIT_FAILURE); }
                 bf_insert(virusBloomFilter, idString);
-                printf("%s inserted in BF for %s\n",idString, citizen->virusName);
+                // printf("%s inserted in BF for %s\n",idString, citizen->virusName);
+
             }
             else {
 
                 // printf("Dont exists this virus %s. Going to insert it\n",citizen->virusName);
-                
-                /* create a bloom filter for this node */
+
+                /* create a bloom filter for this virus */
                 virusBloomFilter = bf_create(K_FOR_BF, bloomSize, hash_i);
 
                 bf_insert(virusBloomFilter, idString);
-                printf("%s inserted in BF for %s\n",idString, citizen->virusName);
+                printf("Created bf for %s\n",citizen->virusName);
+                // printf("%s inserted in BF for %s\n",idString, citizen->virusName);
                 /* insert the bloomFilter in the map */
-                
+
                 map_insert(bloomFilterMap, strdup(citizen->virusName), virusBloomFilter);
-                
+
             }
 
             free(idString);
 
+            /* ----------------- VACCINATED RECORD INSERT ON [VACCINATED] SKIP LIST FOR THIS VIRUS --------------------- */
+            SkipList virusSkipList;
+            m = map_find_node(vaccSkipListMap, citizen->virusName);
+
+
+            /* check if exist skip list with this virus */
+            if (m != MAP_EOF){
+            /* if exists insert citizen in this skiplist*/
+                virusSkipList = (SkipList)map_node_value(vaccSkipListMap,m);
+                if(virusSkipList == NULL) { printf("Error!\n"); exit(EXIT_FAILURE); }
+
+                /* compare values is compare ID */
+                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                // printf("%d inserted in %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+            }
+            else{
+            /* if dont exists create skiplist, insert record */
+
+                /* create a skiplist for this virus */
+                virusSkipList = SL_create(MAX_SKIPLIST_LEVEL,destroy_virus,NULL);
+                /* compare values is compare ID */
+
+                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                // printf("%d inserted in NEW %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+
+                map_insert(vaccSkipListMap, strdup(citizen->virusName),virusSkipList);
+
+            }
+
+
         }
-        
+        else if(strcmp(citizen->isVaccinated,"NO\n")==0 || strcmp(citizen->isVaccinated,"NO")==0){
+            /* if the citizen is NOT VACCINATED */
+
+            /* -------------- NOT VACCINATED RECORD INSERT ON THE BLOOM FILTER FOR THIS VIRUS --------------------- */
+
+            SkipList virusSkipList;
+            MapNode m = map_find_node(notVaccSkipListMap, citizen->virusName);
+
+
+            /* check if exist skip list with this virus */
+            if (m != MAP_EOF){
+            /* if exists insert citizen in this skiplist*/
+                virusSkipList = (SkipList)map_node_value(notVaccSkipListMap,m);
+                if(virusSkipList == NULL) { printf("Error!\n"); exit(EXIT_FAILURE); }
+
+                /* compare values is compare ID */
+                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                // printf("%d inserted in %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+            }
+            else{
+            /* if dont exists create skiplist, insert record */
+
+                /* create a skiplist for this virus */
+                virusSkipList = SL_create(MAX_SKIPLIST_LEVEL,destroy_virus,NULL);
+                /* compare values is compare ID */
+
+                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                // printf("%d inserted in NEW %s **NOT** VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+
+                map_insert(notVaccSkipListMap, strdup(citizen->virusName),virusSkipList);
+
+            }
+
+        }
+
         /* print citizen's fields to be sure */
         // printCitizen(citizen);
 
@@ -160,47 +241,50 @@ int main(int argc, char *argv[]){
             case INPT_1:
                 printGreen("vaccineStatusBloom\n");
                 break;
-            
+
             case INPT_2:
                 printGreen("vaccineStatus\n");
                 break;
-                
+
             case INPT_3:
                 printGreen("populationStatus\n");
                 break;
-    
+
             case INPT_4:
                 printGreen("popStatusbyAge\n");
                 break;
 
             case INPT_5:
                 printGreen("insertCitizenRecord\n");
-                break;  
+                break;
 
             case INPT_6:
                 printGreen("vaccinateNow\n");
                 break;
-                    
+
             case INPT_7:
                 printGreen("list-nonVaccinated-Persons\n");
                 break;
-                    
+
             case INVALID_INPT:
                 printRed("Please give a valid instruction\n");
                 break;
             case ARG_ERR:
                 printRed("Please give valid arguments\n");
-                    
+
         }
     }
     printf("Record inserted : %d\n",map_size(citizenMap));
-    printf("Bloomfilters created : %d\n",map_size(bloomFilterMap));
-    
+    printf("Bloomfilters created for VACCINATED people : %d\n",map_size(bloomFilterMap));
+    printf("Skiplists created for VACCINATED people : %d\n",map_size(vaccSkipListMap));
+    printf("Skiplists created for NOT VACCINATED people : %d\n",map_size(notVaccSkipListMap));
 
 
     fclose(input_fp);
     free(recordFile);
     map_destroy(citizenMap);
     map_destroy(bloomFilterMap);
+    map_destroy(vaccSkipListMap);
+    map_destroy(notVaccSkipListMap);
 
 }
