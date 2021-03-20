@@ -200,7 +200,6 @@ void test_iterate() {
 	for (MapNode node = map_first(map); node != MAP_EOF; node = map_next(map, node)) {
 		int* key = map_node_key(map, node);
 		int* value = map_node_value(map, node);
-
 		TEST_ASSERT(*key >= 0 && *key < N && !seen[*key]);
 		TEST_ASSERT(*value == 2 * *key);
 

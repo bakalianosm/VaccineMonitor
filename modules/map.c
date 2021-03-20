@@ -128,7 +128,7 @@ void map_insert(Map map, Pointer key, Pointer value) {
 		toInsert->value = value;
 
 		// Εισαγωή νέου κόμβου στο Map
-		LL_insert_at_start(map->array[bucket], toInsert);
+		LL_insert_after(map->array[bucket], NULL, toInsert);
 
 		// Αύξηση του μεγέθους του
 		map->size++;

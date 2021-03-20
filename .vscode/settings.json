@@ -2,6 +2,10 @@
     "files.associations": {
         "linkedlist.h": "c",
         "bloomfilter.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "common.h": "c",
+        "skiplist.h": "c",
+        "string.h": "c",
+        "sstream": "c"
     }
 }

@@ -241,7 +241,7 @@ void SL_remove(SkipList skiplist, Pointer key, CompareFunc compare){
             x = x->next[i];
         }
     }
-    
+
     if (skiplist->destroy_key != NULL && delNode->key!=NULL){
         skiplist->destroy_key(delNode->key);
     }
@@ -252,6 +252,7 @@ void SL_remove(SkipList skiplist, Pointer key, CompareFunc compare){
     if (delNode->next != NULL) free(delNode->next);
     if (delNode!= NULL)  free(delNode);
 }
+
 void SL_destroy(SkipList skiplist){
 
     skipListNode node = skiplist->header;
