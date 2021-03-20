@@ -178,5 +178,7 @@ ListNode LL_find_node(LinkedList list, Pointer value, CompareFunc compare){
 }
 
 Pointer LL_node_val(ListNode node){
-    return node->value;
+    if(node != NULL)
+        return node->value;
+    else return NULL;
 }
