@@ -16,6 +16,7 @@
 /* -------- User-defined header files ------- */
 #include "generalFunctions.h"
 #include "bloomFilter.h"
+#include "skipList.h"
 #include "common.h"
 
 
@@ -100,13 +101,19 @@ void destroy_virus(Pointer value){
     free(value);
 }
 
+
+
 /* A function that is used to destroy a bloom filter from a map */
 void destroy_virus_bf(Pointer rec){
     bf_destroy((BloomFilter)rec);
 }
 
+void destroy_vacc_skip_list(Pointer value){
+    SL_destroy((SkipList)value);
+}
+
 void parseValues(char buffer[], char* array[]){
-    
+
     int i = 0;
     array[i] = strtok(buffer, " ");
     while(array[i] !=NULL ){
@@ -117,9 +124,9 @@ void parseValues(char buffer[], char* array[]){
 
 ERR_CHK assignValues(char* valuesArray[],int *ID,   char **firstName, char **lastName, char **country, int *age, char **virusName, char **isVaccinated, date* dateVaccinated){
     ERR_CHK ERRNO = NO_ERROR;
-    
+
     *ID = atoi(valuesArray[0]);
-    
+
     *firstName = strdup(valuesArray[1]);
     *lastName = strdup(valuesArray[2]);
     *country = strdup(valuesArray[3]);
@@ -181,14 +188,14 @@ Record initializeCitizen(int ID,   char *firstName, char *lastName, char *countr
     citizen->country = strdup(country);
     citizen->age = age;
     citizen->virusName = strdup(virusName);
-    
+
     citizen->isVaccinated = strdup(isVaccinated);
 
     if(dateVaccinated != NULL ){
         citizen->dateVaccinated = strdup(dateVaccinated);
     }
- 
-    return citizen;  
+
+    return citizen;
 
 }
 
@@ -214,11 +221,11 @@ int countArgs(char* str) {
     }
 
     return cnt;
-  
+
 }
 
 int checkID(char str[]){
-    
+
     int length = strlen(str);
 
     if (length > 4 ) return 0;
@@ -249,13 +256,13 @@ USR_INPT readUserInput(Map bfMap){
         int numOfArguments = countArgs(buf) - 1;
         strcpy(str,buf);
         char *buffer = strtok(buf, " ");
-        int *arr[numOfArguments+3];
+        int *arr[numOfArguments+2];
         if(strcmp("exit\n", buffer) ==0){
             return USR_EXIT;
         }
         else if(strcmp("vaccineStatusBloom", buffer) ==0){
             if (numOfArguments == 2){
-                
+
                 parseValues(str, arr);
                 if (!checkID(arr[1])) return ARG_ERR; /* invalid id. either alpharethmetic either length >4 */
 
@@ -263,7 +270,7 @@ USR_INPT readUserInput(Map bfMap){
                 removeChar(virus,'\n');
                 unsigned char *IDstring = (unsigned char*)strdup(arr[1]);
                 MapNode m = MAP_EOF;
-                
+
                 m = map_find_node(bfMap, virus);
 
                 if(m != MAP_EOF){
@@ -291,6 +298,15 @@ USR_INPT readUserInput(Map bfMap){
         else if(strcmp("vaccineStatus", buffer) ==0 || strcmp("vaccineStatus\n", buffer) ==0){
             if (numOfArguments == 2){
                 printf("Given arguments are %d \n",numOfArguments);
+                parseValues(str, arr);
+                if (!checkID(arr[1])) return ARG_ERR; /* invalid id. either alpharethmetic either length >4 */
+
+                char* virus = strdup(arr[2]);
+                removeChar(virus,'\n');
+
+                printf("args are %s %s",arr[1],arr[2]);
+
+
                 return INPT_2;
             }
             else if (numOfArguments == 1) {
@@ -301,7 +317,7 @@ USR_INPT readUserInput(Map bfMap){
                 printRed("Usage : ./vaccineStatus citizenID [virusName]\n");
                 return ARG_ERR;
             }
-            
+
         }
         else if(strcmp("populationStatus", buffer) ==0 || strcmp("populationStatus\n", buffer) ==0){
             if (numOfArguments == 3){
@@ -328,7 +344,7 @@ USR_INPT readUserInput(Map bfMap){
             }
             else {
                 printRed("Usage : ./popStatusByAge [country] virusName date1 date2\n");
-                return ARG_ERR;  
+                return ARG_ERR;
             }
             // printf("Given arguments are %d \n",numOfArguments);
         }
@@ -346,7 +362,7 @@ USR_INPT readUserInput(Map bfMap){
                 return ARG_ERR;
             }
             // printf("Given arguments are %d \n",numOfArguments);
-           
+
         }
         else if(strcmp("vaccinateNow", buffer) ==0){
             if (numOfArguments == 6){
@@ -358,7 +374,7 @@ USR_INPT readUserInput(Map bfMap){
                 return ARG_ERR;
             }
             // printf("Given arguments are %d \n",numOfArguments);
-            
+
         }
         else if(strcmp("list-nonVaccinated-Persons", buffer) ==0 || strcmp("list-nonVaccinated-Persons", buffer) ==0){
              if (numOfArguments == 1){
@@ -373,7 +389,6 @@ USR_INPT readUserInput(Map bfMap){
         }
         else return INVALID_INPT;
     }
-    
+
     return 1;
 }
-

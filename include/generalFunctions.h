@@ -45,11 +45,13 @@ int compare_viruses(Pointer a, Pointer b);
 /* A function that is used to destroy a key of BF Virus Map */
 void destroy_virus(Pointer value);
 
-/* A function that is used to destroy a bloom filter from a map */
+
+/* A function that is used to destroy a bloom filter [value] from a map */
 void destroy_virus_bf(Pointer rec);
 
-
-/* A function that parses the values from each sentence from the 
+/* A function that is used to destroy a skiplist [value] from a map */
+void destroy_vacc_skip_list(Pointer value);
+/* A function that parses the values from each sentence from the
    input file to an array of strings */
 void parseValues(char buffer[], char* array[]);
 
