@@ -223,9 +223,34 @@ Pointer SL_find(SkipList skiplist, Pointer key, CompareFunc compare){
 }
 
 void SL_remove(SkipList skiplist, Pointer key, CompareFunc compare){
+    skipListNode x = skiplist->header;
+    skipListNode delNode = NULL;
 
-return ;    
- 
+    for (int i = skiplist->curLevel; i>=1 ; --i){
+        while( x->next[i]!=NULL){
+            if( compare(x->next[i]->key , key) >0 ){
+                break;
+            }
+            else if (compare(x->next[i]->key , key) ==0){
+                delNode = x->next[i];
+                x->next[i] = x->next[i]->next[i];
+
+                // free(delNode);
+                break;
+            }
+            x = x->next[i];
+        }
+    }
+    
+    if (skiplist->destroy_key != NULL && delNode->key!=NULL){
+        skiplist->destroy_key(delNode->key);
+    }
+    if (skiplist->destroy_value != NULL && delNode->value!=NULL){
+        skiplist->destroy_value(delNode->value);
+    }
+
+    if (delNode->next != NULL) free(delNode->next);
+    if (delNode!= NULL)  free(delNode);
 }
 void SL_destroy(SkipList skiplist){
 
