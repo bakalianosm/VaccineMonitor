@@ -17,9 +17,10 @@
 #define ARG_ERR 11
 
 #include <stdbool.h>
+#include "dates.h"
+
 
 typedef void* Pointer;
-typedef char* date;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef int ERR_CHK;
@@ -30,6 +31,7 @@ typedef void (*PrintFunc)(Pointer value);
 
 typedef unsigned long (*BF_HashFunc)(unsigned char *str, unsigned int i);
 
+
 struct record {
     int ID;
     char *firstName;
@@ -38,7 +40,7 @@ struct record {
     int age;
     char *virusName;
     char* isVaccinated;
-    date dateVaccinated;
+    Date dateVaccinated;
 };
 
 typedef struct record* Record;
