@@ -544,8 +544,88 @@ USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, L
         }
         else if(strcmp("popStatusByAge", buffer) ==0 || strcmp("popStatusByAge\n", buffer) ==0){
             if (numOfArguments == 3){
+                
+                
                 printf("Given arguments are %d \n",numOfArguments);
+                parseValues(str, arr);
+                virus = strdup(arr[1]);
+                dateFrom = strdup(arr[2]);
+                dateTo = strdup(arr[3]);
+                Date from = transformDate(dateFrom);
+                Date to = transformDate(dateTo);
+                if (compareDates(from,to) > 0) {
+                    printRed("populationStatus : Error! Invalid dates\n");
+                    return ARG_ERR;
+                }
 
+                /* iterate through the list of viruses */
+                for(ListNode node = LL_first(countriesList) ; node != NULL ; node = LL_next(node)){
+                    int ageArr[4] = {0, 0, 0, 0};
+                    country = LL_node_val(node);
+                    printf("%s\n",country);
+                    MapNode m = MAP_EOF;
+                    m = map_find_node(countryPopulationMap, country);
+                    if(m != MAP_EOF){
+                        int* pop = map_node_value(countryPopulationMap, m);
+                        /* country's population */
+                        int population = *pop;
+                        
+                        /* vaccinated people on coyntry */
+                        int countryVaccinatedPeople = 0;
+                        
+                        MapNode m1 = map_find_node(vaccSkipListMap, virus);
+                        
+                        if(m1 != MAP_EOF){
+                            skipListNode sl =  NULL;
+                            SkipList virusSL = (SkipList)map_node_value(vaccSkipListMap,m1);
+                            for(sl = SL_first(virusSL) ; sl != NULL ; sl = SL_next(sl)){
+                                Record citizen = SL_node_val(sl);
+                                if(compare_countries(country,citizen->country)==0){
+                                    if( (compareDates(from, citizen->dateVaccinated) <= 0) && (compareDates(to, citizen->dateVaccinated) >=0)){
+                                
+                                        if(citizen->age >= 0 && citizen->age <= 20){
+                                            ageArr[0]++;
+                                        }
+                                        else if(citizen->age > 20 && citizen->age <= 40){
+                                            ageArr[1]++;
+
+                                        }
+                                        else if(citizen->age > 40 && citizen->age <= 60){
+                                            ageArr[2]++;
+                                        }
+                                        else{
+                                            ageArr[3]++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        else{
+                            printRed("Error. No vaccinated records for this country and virus!\n");
+                        }
+
+                        float percentage1 = (float)ageArr[0]/population * 100;
+                        printf("0-20 %d %.2f%%\n", ageArr[0],percentage1 );
+
+                        float percentage2 = (float)ageArr[1]/population * 100;
+                        printf("20-40 %d %.2f%%\n", ageArr[1],percentage2 );
+
+                        float percentage3 = (float)ageArr[2]/population * 100;
+                        printf("40-60 %d %.2f%%\n", ageArr[2],percentage3 );
+
+                        float percentage4 = (float)ageArr[3]/population * 100;
+                        printf("60+ %d %.2f%%\n", ageArr[3],percentage4 );
+                    }
+                    printf("\n");
+                }
+
+                
+                if (virus != NULL) free(virus);
+                if (dateFrom != NULL) free(dateFrom);
+                if (dateTo != NULL) free(dateTo);
+                if (from != NULL) free(from);
+                if (to != NULL) free(to);
 
                 return INPT_4;
             }
