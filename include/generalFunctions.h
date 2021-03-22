@@ -93,4 +93,4 @@ void removeChar(char *str, char toRem);
 
 
 /* Read user's options */
-USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, LinkedList virusesList, Map countryPopulationMap, LinkedList countriesList);
+USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, LinkedList virusesList, Map countryPopulationMap, LinkedList countriesList);

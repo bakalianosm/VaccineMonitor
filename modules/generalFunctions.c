@@ -21,6 +21,8 @@
 #include "dates.h"
 #include "common.h"
 
+#define K_FOR_BF 16
+#define MAX_SKIPLIST_LEVEL 6
 
 uint hash_vaccine(Pointer value){
     uint first = hash_int(((hashRec)value)->ID);
@@ -255,7 +257,7 @@ void removeChar(char *str, char toRem){
     *dst = '\0';
 }
 
-USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, LinkedList virusesList, Map countryPopulationMap, LinkedList countriesList){
+USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, LinkedList virusesList, Map countryPopulationMap, LinkedList countriesList){
 
     char buf[BUFFER_SIZE];
     char str[BUFFER_SIZE];
@@ -265,8 +267,11 @@ USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, L
         char *buffer = strtok(buf, " ");
         int *arr[numOfArguments+2];
         int *searchID = NULL;
+        char* firstName = NULL;
+        char* lastName = NULL;
         char *virus = NULL;
         char* country = NULL;
+        int* age = NULL;
         char* dateFrom = NULL;
         char* dateTo = NULL;
         if(strcmp("exit\n", buffer) ==0){
@@ -600,7 +605,6 @@ USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, L
                                 }
                             }
                         }
-                        
                         else{
                             printRed("Error. No vaccinated records for this country and virus!\n");
                         }
@@ -617,10 +621,15 @@ USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, L
                         float percentage4 = (float)ageArr[3]/population * 100;
                         printf("60+ %d %.2f%%\n", ageArr[3],percentage4 );
                     }
+                    else {
+                        printf("popStatusByAge: Error! Invalid country name or does not exist\n");
+                    }
                     printf("\n");
                 }
-
                 
+
+
+
                 if (virus != NULL) free(virus);
                 if (dateFrom != NULL) free(dateFrom);
                 if (dateTo != NULL) free(dateTo);
@@ -631,6 +640,84 @@ USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, L
             }
             else if (numOfArguments == 4){
                 printf("Given arguments are %d \n",numOfArguments);
+
+                parseValues(str, arr);
+                country = strdup(arr[1]);
+                virus = strdup(arr[2]);
+                dateFrom = strdup(arr[3]);
+                dateTo = strdup(arr[4]);
+                Date from = transformDate(dateFrom);
+                Date to = transformDate(dateTo);
+
+                if (compareDates(from,to) > 0) {
+                    printRed("populationStatus : Error! Invalid dates\n");
+                    return ARG_ERR;
+                }
+                int ageArr[4] = {0, 0, 0, 0};
+                MapNode m = MAP_EOF;
+                m = map_find_node(countryPopulationMap, country);
+                if(m != MAP_EOF){
+                    int* pop = map_node_value(countryPopulationMap, m);
+                    /* country's population */
+                    int population = *pop;
+                    
+                    /* vaccinated people on coyntry */
+                    int countryVaccinatedPeople = 0;
+                    
+                    MapNode m1 = map_find_node(vaccSkipListMap, virus);
+                    
+                    if(m1 != MAP_EOF){
+                        skipListNode sl =  NULL;
+                        SkipList virusSL = (SkipList)map_node_value(vaccSkipListMap,m1);
+                        for(sl = SL_first(virusSL) ; sl != NULL ; sl = SL_next(sl)){
+                            Record citizen = SL_node_val(sl);
+                            if(compare_countries(country,citizen->country)==0){
+                                if( (compareDates(from, citizen->dateVaccinated) <= 0) && (compareDates(to, citizen->dateVaccinated) >=0)){
+                            
+                                    if(citizen->age >= 0 && citizen->age <= 20){
+                                        ageArr[0]++;
+                                    }
+                                    else if(citizen->age > 20 && citizen->age <= 40){
+                                        ageArr[1]++;
+
+                                    }
+                                    else if(citizen->age > 40 && citizen->age <= 60){
+                                        ageArr[2]++;
+                                    }
+                                    else{
+                                        ageArr[3]++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    else{
+                        printRed("Error. No vaccinated records for this country and virus!\n");
+                    }
+
+                    float percentage1 = (float)ageArr[0]/population * 100;
+                    printf("0-20 %d %.2f%%\n", ageArr[0],percentage1 );
+
+                    float percentage2 = (float)ageArr[1]/population * 100;
+                    printf("20-40 %d %.2f%%\n", ageArr[1],percentage2 );
+
+                    float percentage3 = (float)ageArr[2]/population * 100;
+                    printf("40-60 %d %.2f%%\n", ageArr[2],percentage3 );
+
+                    float percentage4 = (float)ageArr[3]/population * 100;
+                    printf("60+ %d %.2f%%\n", ageArr[3],percentage4 );
+                }
+                else {
+                    printf("popStatusByAge: Error! Invalid country name or does not exist\n");
+                }
+                if (country != NULL) free(country);
+                if (virus != NULL) free(virus);
+                if (dateFrom != NULL) free(dateFrom);
+                if (dateTo != NULL) free(dateTo);
+                if (from != NULL) free(from);
+                if (to != NULL) free(to);
+
                 return INPT_4;
             }
             else {
@@ -641,7 +728,7 @@ USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, L
         }
         else if(strcmp("insertCitizenRecord", buffer) ==0 || strcmp("insertCitizenRecord\n", buffer) ==0){
             if (numOfArguments == 7){
-                printf("Given arguments are %d \n",numOfArguments);
+
                 return INPT_5;
             }
             else if (numOfArguments == 8){
@@ -656,9 +743,86 @@ USR_INPT readUserInput(Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, L
 
         }
         else if(strcmp("vaccinateNow", buffer) ==0){
-            if (numOfArguments == 6){
+            if (numOfArguments == 7){
                 printf("Given arguments are %d \n",numOfArguments);
-                return INPT_5;
+
+                parseValues(str, arr);
+                
+                firstName = strdup(arr[2]);
+                lastName = strdup(arr[3]);
+                country = strdup(arr[4]);
+                virus = strdup(arr[6]);
+                removeChar(virus, "\n");
+                printf("virus is %s\n",virus);
+                MapNode m = MAP_EOF;
+
+                m = map_find_node(vaccSkipListMap, virus);
+
+                // if(m != MAP_EOF){
+                //     skipListNode sl = NULL;
+                //     SkipList virusSL = (SkipList)map_node_value(vaccSkipListMap,m);
+                //     sl = SL_find_node(virusSL, searchID, compare_values);
+                //     if(sl != NULL){
+                //         Record vaccinatedCitizen = SL_node_val(sl);
+                //         if(vaccinatedCitizen->dateVaccinated != NULL){
+                //             printf("ERROR: CITIZEN %d ALREADY VACCINATED ON ");
+                //             printDate(vaccinatedCitizen->dateVaccinated);
+                //             return INPT_6;
+                //         }
+                //     }
+                //     else {
+                //         /*insert on bf and skiplist */
+                //         char* TODAY = strdup("23-3-2021");
+                //         Record citizen = initializeCitizen(integerID, firstName, lastName, country, integerAge,virus, "YES", TODAY );
+                //         /* insert on BF */
+                //         m = map_find_node(bfMap, virus);
+                //         BloomFilter virusBloomFilter = NULL;
+
+                //         if( m != NULL){
+                //             virusBloomFilter = (BloomFilter)map_node_value(bfMap, m);
+                //             if (virusBloomFilter == NULL) { printf("Error!\n") ; exit(EXIT_FAILURE); }
+                //             bf_insert(virusBloomFilter, IDstring);
+                //         }
+                //         else{
+                //             virusBloomFilter = bf_create(K_FOR_BF, bloomSize, hash_i);
+                //             bf_insert(virusBloomFilter, IDstring);
+                //             map_insert(bfMap, strdup(virus), virusBloomFilter);
+                //         }
+                        
+                //         /* insert on skiplist */
+
+                //         /* ----------------- VACCINATED RECORD INSERT ON [VACCINATED] SKIP LIST FOR THIS VIRUS --------------------- */
+                //         SkipList virusSkipList;
+                //         m = map_find_node(vaccSkipListMap, virus);
+
+
+                //         /* check if exist skip list with this virus */
+                //         if (m != MAP_EOF){
+                //         /* if exists insert citizen in this skiplist*/
+                //             virusSkipList = (SkipList)map_node_value(vaccSkipListMap,m);
+                //             if(virusSkipList == NULL) { printf("Error!\n"); exit(EXIT_FAILURE); }
+
+                //             /* compare values is compare ID */
+                //             SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                //             // printf("%d inserted in %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+                //         }
+                //         else{
+                //         /* if dont exists create skiplist, insert record */
+
+                //             /* create a skiplist for this virus */
+                //             virusSkipList = SL_create(MAX_SKIPLIST_LEVEL,destroy_virus,NULL);
+                //             /* compare values is compare ID */
+
+                //             SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                //             // printf("%d inserted in NEW %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+
+                //             map_insert(vaccSkipListMap, strdup(citizen->virusName),virusSkipList);
+
+                //         }
+                        
+                    // }
+                // }
+                return INPT_6;
             }
             else {
                 printRed("Usage : ./vaccinateNow citizenID firstName lastName country age virusName \n");

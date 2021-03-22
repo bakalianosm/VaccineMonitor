@@ -277,7 +277,7 @@ int main(int argc, char *argv[]){
 
     // /* read user's input from keyboard */
     USR_INPT input;
-    while ( ( input = readUserInput(bloomFilterMap,vaccSkipListMap,notVaccSkipListMap, virusesList, countryPopulationMap,countriesList)) != USR_EXIT){
+    while ( ( input = readUserInput(bloomSize, bloomFilterMap,vaccSkipListMap,notVaccSkipListMap, virusesList, countryPopulationMap,countriesList)) != USR_EXIT){
         switch (input){
             case INPT_1:
                 printGreen("vaccineStatusBloom\n");
