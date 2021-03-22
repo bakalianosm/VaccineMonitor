@@ -29,8 +29,8 @@ int main(void){
 
 		SL_insert(sl ,key_array[i], value_array[i],compare_ints);
 		// Ανά τακτά χρονικά διαστήματα διαγράφουμε κάποιο κλειδί που μόλις βάλαμε
-		if (i % 2 == 0) 
-			SL_remove(sl, key_array[i],compare_ints);
+		// if (i % 2 == 0) 
+		// 	SL_remove(sl, key_array[i],compare_ints);
 	}
     // LinkedList ll = LL_create(NULL);
 
@@ -45,11 +45,17 @@ int main(void){
 
 
     // printf("Estimated layers are %d \n", SL_layers(skip));
-    SL_print(sl,print_int);
 
-    SL_destroy(sl);
-    free(key_array);
-	free(value_array);
+    // for(skipListNode node = SL_first(sl) ; node != NULL ; node = SL_next(node)){
+    //     int* key = SL_node_key(node);
+    //     int* value = SL_node_val(node);
+    //     printf("key is %d val is %d\n",*key, *value);
+    // }
+    // SL_print(sl,print_int);
+
+    // SL_destroy(sl);
+    // free(key_array);
+	// free(value_array);
     // LL_destroy(ll);
    
     // int arr[] = {6,2,3,9,15,1,22,45,96,27,14,110,123,125,129,444,3445,4874,654,987,44};

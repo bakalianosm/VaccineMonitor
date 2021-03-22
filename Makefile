@@ -15,9 +15,9 @@ CFLAGS = -Wall -g -I$(INCLUDE)
 LDFLAGS = -lm
 
 # .o files
-OBJS = $(SOURCE)/vaccineMonitor.o $(MODULES)/linkedList.o  $(MODULES)/bloomFilter.o  $(MODULES)/skipList.o  $(MODULES)/generalFunctions.o $(MODULES)/map.o  $(MODULES)/monitorChoices.o  
+OBJS = $(SOURCE)/vaccineMonitor.o $(MODULES)/linkedList.o  $(MODULES)/bloomFilter.o  $(MODULES)/skipList.o  $(MODULES)/generalFunctions.o $(MODULES)/map.o  $(MODULES)/dates.o 
 OBJS2= $(SOURCE)/ADTMap_test.o $(MODULES)/map.o $(MODULES)/linkedList.o
-OBJS3= $(SOURCE)/skip.o $(MODULES)/linkedList.o $(MODULES)/skipList.o  $(MODULES)/bloomFilter.o $(MODULES)/map.o $(MODULES)/generalFunctions.o
+OBJS3= $(SOURCE)/skip.o $(MODULES)/linkedList.o $(MODULES)/skipList.o  $(MODULES)/bloomFilter.o $(MODULES)/map.o $(MODULES)/generalFunctions.o $(MODULES)/dates.o
 # The executable program
 EXEC = vaccineMonitor
 EXEC2 = ADTMap_test

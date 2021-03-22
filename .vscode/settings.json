@@ -6,6 +6,8 @@
         "common.h": "c",
         "skiplist.h": "c",
         "string.h": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "stdio.h": "c",
+        "dates.h": "c"
     }
 }
