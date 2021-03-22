@@ -38,6 +38,9 @@ void SL_remove(SkipList skiplist, Pointer key,CompareFunc compare);
 /* This function is used to free all the memory that the list has allocated */
 void SL_destroy(SkipList skiplist);
 
+/* skiplist iteration */
+skipListNode SL_first(SkipList skiplist);
+skipListNode SL_next(skipListNode node);
 /* Returns the first node with the given "key" base on the compare function */
 skipListNode SL_find_node(SkipList skiplist, Pointer key, CompareFunc compare);
 

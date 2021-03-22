@@ -46,15 +46,13 @@ SkipList SL_create(int maxLevel, DestroyFunc destroy_key, DestroyFunc destroy_va
     if (skiplist == NULL){
         printf("Error with skip list creation\n");
     }
+    skiplist->size = 0;
     skiplist->curLevel = 1;
     skiplist->maxLevel = maxLevel;
     
     skipListNode header = malloc(sizeof(*header));
     header->next = malloc( (maxLevel+1) * sizeof(*(header->next)));
     
-    // if (header == NULL ) return NULL;
-    // if (header->next == NULL ) return NULL;
-
     for(int i = 0 ; i<= skiplist->maxLevel ; i++){
         header->next[i] = NULL;
     }
@@ -145,13 +143,16 @@ void SL_insert(SkipList skiplist, Pointer key, Pointer value,CompareFunc compare
         x->value = value;
 
         x->next = malloc(sizeof(*(x->next))* (level +1));
-
+        
+        for (int i = 1 ; i <= level ; i++){
+            x->next[i] = NULL;
+        }
         for (int i = 1 ; i <= level ; i++){
             x->next[i] = update[i]->next[i];
             update[i]->next[i] = x;
         }
     }
-
+    skiplist->size++;
 }
 
 skipListNode SL_find_node(SkipList skiplist, Pointer key, CompareFunc compare){
@@ -162,11 +163,13 @@ skipListNode SL_find_node(SkipList skiplist, Pointer key, CompareFunc compare){
 
     /* start from the highest level on the list */
     for (int i = skiplist->curLevel ; i >= 0 ; --i){
-        while( x->next[i]!=NULL){
-            if( compare(x->next[i]->key , key) >=0 ){
-                break;
+        if(x == NULL){
+            while( x->next[i]!=NULL){
+                if( compare(x->next[i]->key , key) >=0 ){
+                    break;
+                }
+                x = x->next[i];
             }
-            x = x->next[i];
         }
     }
 
@@ -280,3 +283,14 @@ void SL_destroy(SkipList skiplist){
 }
 
 
+skipListNode SL_first(SkipList skiplist){
+   
+   skipListNode node = skiplist->header;
+   if(node != NULL) return node->next[1];
+   else return NULL;
+}
+
+skipListNode SL_next(skipListNode node){
+    return node->next[1];
+    
+}
