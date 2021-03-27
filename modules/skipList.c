@@ -162,15 +162,15 @@ skipListNode SL_find_node(SkipList skiplist, Pointer key, CompareFunc compare){
     skipListNode x = skiplist->header;
 
     /* start from the highest level on the list */
-    for (int i = skiplist->curLevel ; i >= 0 ; --i){
-        if(x == NULL){
+    for (int i = skiplist->curLevel ; i >= 1 ; --i){
+        // if(x == NULL){
             while( x->next[i]!=NULL){
                 if( compare(x->next[i]->key , key) >=0 ){
                     break;
                 }
                 x = x->next[i];
             }
-        }
+        // }
     }
 
     if(x->next[1]!=NULL){
@@ -291,6 +291,7 @@ skipListNode SL_first(SkipList skiplist){
 }
 
 skipListNode SL_next(skipListNode node){
-    return node->next[1];
-    
+    if (node != NULL)
+        return node->next[1];
+    else return NULL;
 }
