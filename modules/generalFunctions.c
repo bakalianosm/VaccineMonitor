@@ -173,7 +173,7 @@ ERR_CHK assignValues(char* valuesArray[],int *ID,   char **firstName, char **las
         printf("ERROR IN RECORD %d %s %s %s %d %s %s \n", *ID, *firstName, *lastName, *country, *age, *virusName, *isVaccinated);
         ERRNO = NOT_GIVEN_DATE_ERR;
     }
-
+    
     return ERRNO;
 }
 hashRec initializeHashKey(int ID, char* virus){
@@ -275,8 +275,11 @@ USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVac
         char* dateFrom = NULL;
         char* dateTo = NULL;
         if(strcmp("exit\n", buffer) ==0){
-            if(virus != NULL) free(searchID);
+            if(virus != NULL) free(virus);
             if(searchID != NULL) free(searchID);
+            if(firstName != NULL) free(firstName);
+            if(lastName != NULL) free(lastName);
+            if(age != NULL) free(age);
             if(country != NULL) free(country);
             if(dateFrom != NULL) free(dateFrom);
             if(dateTo != NULL) free(dateTo);
@@ -308,9 +311,10 @@ USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVac
                 else {
                     printRed("Sorry no BF for this virus. \n");
                 }
-
-
+                if(virus != NULL) free(virus);
+                if(IDstring != NULL) free(IDstring);
                 return INPT_1;
+
             }
             else{
                 printf("Given arguments are %d \n",numOfArguments);
@@ -357,10 +361,13 @@ USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVac
                 return INPT_2;
             }
             else if (numOfArguments == 1) {
-                printf("Given arguments are %d \n",numOfArguments);
+                // printf("Given arguments are %d \n",numOfArguments);
                 parseValues(str, arr);
+              
+                removeChar(arr[1],'\n');
                 searchID = create_int(atoi(arr[1]));
-                if (searchID > 9999) return ARG_ERR;
+                
+                if (*searchID > 9999) return ARG_ERR;
                 for (ListNode node = LL_first(virusesList) ; node != NULL ; node = LL_next(node)  ){
                     virus = (char *)LL_node_val(node);
                     MapNode m = MAP_EOF;
@@ -396,15 +403,16 @@ USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVac
                             }
                         }
                     }
-    
+                    
                 }
+                if(searchID != NULL) free(searchID);
                 return INPT_2;
             }
             else {
                 printRed("Usage : ./vaccineStatus citizenID [virusName]\n");
                 return ARG_ERR;
             }
-
+        
         }
         else if(strcmp("populationStatus", buffer) ==0 || strcmp("populationStatus\n", buffer) ==0){
             if (numOfArguments == 3){
@@ -447,8 +455,10 @@ USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVac
                         for(sl = SL_first(virusSL) ; sl != NULL ; sl = SL_next(sl)){
                             Record citizen = SL_node_val(sl);
                             if(compare_countries(country,citizen->country)==0){
-                                if( (compareDates(from, citizen->dateVaccinated) <= 0) && (compareDates(to, citizen->dateVaccinated) >=0))
+                                if( (compareDates(from, citizen->dateVaccinated) <= 0) && (compareDates(to, citizen->dateVaccinated) >=0)){
                                     countryVaccinatedPeople++;
+                                }
+
                             }
                         }
 
@@ -510,8 +520,9 @@ USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVac
                         for(sl = SL_first(virusSL) ; sl != NULL ; sl = SL_next(sl)){
                             Record citizen = SL_node_val(sl);
                             if(compare_countries(country,citizen->country)==0){
-                                if( (compareDates(from, citizen->dateVaccinated) <= 0) && (compareDates(to, citizen->dateVaccinated) >=0))
+                                if( (compareDates(from, citizen->dateVaccinated) <= 0) && (compareDates(to, citizen->dateVaccinated) >=0)){
                                     countryVaccinatedPeople++;
+                                }
                             }
 
                            

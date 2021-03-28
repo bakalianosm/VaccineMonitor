@@ -51,6 +51,7 @@ int LL_size(LinkedList list){
 void LL_insert_at_start(LinkedList list, Pointer value){
 
     /* Create a new node */
+    
     ListNode newNode = malloc(sizeof(*newNode));
     newNode->value = value;
 
@@ -163,22 +164,24 @@ ListNode LL_last(LinkedList list){
 ListNode LL_next(ListNode node){
     if(node != NULL )
         return node->next;
-    return NULL ;
+    else
+        return NULL ;
 
 }
 
-ListNode LL_find_node(LinkedList list, Pointer value, CompareFunc compare){
-    
-    /* iterate through the list */
-    for (ListNode node = LL_first(list); node != NULL; node=node->next)
-        if (compare(value, node->value) == 0)
-            return node;
-    
-    return NULL;
-}
 
 Pointer LL_node_val(ListNode node){
     if(node != NULL)
         return node->value;
     else return NULL;
+}
+
+ListNode LL_find_node(LinkedList list, Pointer value, CompareFunc compare){
+    
+    /* iterate through the list */
+    for (ListNode node = list->dummy->next ; node != NULL; node=node->next)
+        if (compare(value, node->value) == 0)
+            return node;
+    
+    return NULL;
 }

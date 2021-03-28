@@ -28,6 +28,8 @@ int main(void){
 		value_array[i] = create_int(i);
 
 		SL_insert(sl ,key_array[i], value_array[i],compare_ints);
+
+        
 		// Ανά τακτά χρονικά διαστήματα διαγράφουμε κάποιο κλειδί που μόλις βάλαμε
 		// if (i % 2 == 0) 
 		// 	SL_remove(sl, key_array[i],compare_ints);
@@ -42,82 +44,29 @@ int main(void){
     // ListNode last = LL_list_last(ll);
     // int *val  = LL_node_val(last);
     // printf("list last is %d\n", *val);
-
+    int * k = create_int(2);
+    skipListNode n1 = SL_find_node(sl, k, compare_ints);
+        if( n1 != NULL){
+            int * val =  SL_node_val(n1);
+            printf("for key 2 value is %d\n", *val);
+        }
+        else {
+            printf("dit not found\n");
+        }
 
     // printf("Estimated layers are %d \n", SL_layers(skip));
 
-    // for(skipListNode node = SL_first(sl) ; node != NULL ; node = SL_next(node)){
-    //     int* key = SL_node_key(node);
-    //     int* value = SL_node_val(node);
-    //     printf("key is %d val is %d\n",*key, *value);
-    // }
-    // SL_print(sl,print_int);
+    for(skipListNode node = SL_first(sl) ; node != NULL ; node = SL_next(node)){
+        int* key = SL_node_key(node);
+        int* value = SL_node_val(node);
+        printf("key is %d val is %d\n",*key, *value);
+    }
+    SL_print(sl,print_int);
+    free(k);
+    SL_destroy(sl);
 
-    // SL_destroy(sl);
-    // free(key_array);
-	// free(value_array);
-    // LL_destroy(ll);
-   
-    // int arr[] = {6,2,3,9,15,1,22,45,96,27,14,110,123,125,129,444,3445,4874,654,987,44};
+    free(key_array);
+    free(value_array);
 
-    // for (int i = 0 ; i < 21 ; i++){
-    //     SL_insert(sl,&arr[i], &arr[i], compare_ints);
-    // }
-
-    // SL_insert(sl, create_int(5000),create_int(5000),compare_ints);
-    //  SL_insert(sl, create_int(3000),create_int(3000),compare_ints);
-    // BloomFilter bf = bf_create(16,1000, hash_i);
-    // SL_print(sl,print_int);
-    // bf_insert(bf, "MICHALIS");
-    // bf_insert(bf, "THANASIS");
-
-
-
-    // printRed("\t\t REMOVING ITEM \n");
-    // int *key_ar[11];
-    // for (int i = 0 ; i < 11 ; i++){
-    //     key_ar[i] = create_int(arr[i]);
-    //     SL_remove(sl, key_ar[i], compare_ints);
-    // }
-
-    // SL_destroy(sl);
-    // bf_insert(bf, "KOSTAS");
-    // bf_insert(bf, "MICHALIS");
-  
-    // skipListNode node = SL_find_node(sl,&arr[4],compare_ints);
-    // if (node==NULL) printf("null node\n");
-    // int *key = SL_node_key(node);
-    // int *val = SL_node_val(node);
-    // printf("node val is %d\t%d", *val, *key);
-    // // bf_search(bf,"KOSTAS");
-    // bf_search(bf,"THANASI");
-   
-    // bf_destroy(bf);
-
-    // SkipList sl = SL_create(16, NULL);
-    // if (sl != NULL ) printf("Skip List created with %d layers\n",SL_layers(sl));
-
-    // int arr[] = {1,5,6,8,10,15,20,105,15,58};
-
-    // for (int i = 0 ; i <10 ; i ++){
-    //     SL_insert(sl, &arr[i], compare_ints);
-    // }
-
-    // SL_print(sl);
-
-    // Map dokimastiko = map_create(compare_viruses,NULL,NULL);
-    // map_set_hash_function(dokimastiko, hash_string);
-    // char* temp1 = strdup("ena");
-    // char* temp2 = strdup("dyo");
-    // char* temp3 = strdup("tria");
-
-
-    // map_insert(dokimastiko, temp1, temp1);
-    // map_insert(dokimastiko, temp2, temp2);
-    // map_insert(dokimastiko, temp3, temp3);
-
-    // MapNode m = MAP_EOF;
-    // m = map_find(dokimastiko ,temp1);
-
-    // if(m==MAP_EOF) printf("Den\n");
+    
 }

@@ -69,22 +69,27 @@ int main(int argc, char *argv[]){
     /* Initialize a list that will contain only the countries */
     LinkedList countriesList =  LL_create(NULL);
 
+
+    /* a map that holds distinct records */
+    Map distinctCitizens = map_create(compare_IDs, NULL, NULL);
+    map_set_hash_function(distinctCitizens, hash_int);
+
     /* Initialize the Citizen Map */
     Map citizenMap = map_create(compare_keys,record_destroy_key, record_destroy_value );
     map_set_hash_function(citizenMap,hash_vaccine);
 
     /* Initialize the Bloom Filter Map */
-    Map bloomFilterMap =  map_create(compare_viruses, destroy_virus, destroy_virus_bf);
+    Map bloomFilterMap =  map_create(compare_viruses, NULL, destroy_virus_bf);
     map_set_hash_function(bloomFilterMap,hash_string);
 
 
     /* Initialize the VACCINATED Skip List Map */
-    Map vaccSkipListMap = map_create(compare_viruses, free, destroy_vacc_skip_list);
+    Map vaccSkipListMap = map_create(compare_viruses, NULL, destroy_vacc_skip_list);
     map_set_hash_function(vaccSkipListMap, hash_string);
 
 
     /* Initialize the NOT VACCINATED Skip List Map */
-    Map notVaccSkipListMap = map_create(compare_viruses, free, destroy_vacc_skip_list);
+    Map notVaccSkipListMap = map_create(compare_viruses, NULL, destroy_vacc_skip_list);
     map_set_hash_function(notVaccSkipListMap, hash_string);
 
 
@@ -119,7 +124,15 @@ int main(int argc, char *argv[]){
         ERR_CHK error = assignValues(array,&parsedID, &parsedFirstName, &parsedLastName, &parsedCountry, &parsedAge, &parsedVirusName, &parsedIsVaccinated, &parsedDateVaccinated);
 
         /* if the above function return an error code , we have to ignore this record */
-        if(error != NO_ERROR) continue;
+        if(error != NO_ERROR){
+            if(parsedFirstName !=NULL) free(parsedFirstName);
+            if(parsedLastName !=NULL) free(parsedLastName);
+            if(parsedCountry !=NULL) free(parsedCountry);
+            if(parsedVirusName !=NULL) free(parsedVirusName);
+            if(parsedIsVaccinated !=NULL) free(parsedIsVaccinated);
+            if(parsedDateVaccinated!=NULL) free(parsedDateVaccinated);
+            continue;
+        } 
 
         /* create a new record */
         Record citizen = initializeCitizen(parsedID, parsedFirstName, parsedLastName, parsedCountry, parsedAge, parsedVirusName, parsedIsVaccinated, parsedDateVaccinated);
@@ -128,7 +141,25 @@ int main(int argc, char *argv[]){
 
         map_insert(citizenMap, hashKey, citizen);
 
-       
+        /* ----------------- COUNTRY POPULATION INSERT --------------------- */
+
+        /* increment the country population only if the record does not exists for
+        any other virus list */
+        MapNode toFind = map_find_node(distinctCitizens, &citizen->ID);
+        if (toFind == NULL){
+            map_insert(distinctCitizens,&citizen->ID, citizen);
+
+            MapNode m = MAP_EOF;
+            m = map_find_node(countryPopulationMap, citizen->country);
+            if(m != MAP_EOF){
+                int* population = map_node_value(countryPopulationMap, m);
+                (*population)++;
+            }
+            else{
+                map_insert(countryPopulationMap, citizen->country, create_int(1));
+            }
+        }
+
         ListNode lnode = NULL;
 
          /* insert virus on the list with the viruses if not extists */
@@ -179,7 +210,7 @@ int main(int argc, char *argv[]){
                 // printf("%s inserted in BF for %s\n",idString, citizen->virusName);
                 /* insert the bloomFilter in the map */
 
-                map_insert(bloomFilterMap, strdup(citizen->virusName), virusBloomFilter);
+                map_insert(bloomFilterMap, citizen->virusName, virusBloomFilter);
 
             }
 
@@ -197,20 +228,20 @@ int main(int argc, char *argv[]){
                 if(virusSkipList == NULL) { printf("Error!\n"); exit(EXIT_FAILURE); }
 
                 /* compare values is compare ID */
-                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                SL_insert(virusSkipList, &citizen->ID,citizen, compare_IDs);
                 // printf("%d inserted in %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
             }
             else{
             /* if dont exists create skiplist, insert record */
 
                 /* create a skiplist for this virus */
-                virusSkipList = SL_create(MAX_SKIPLIST_LEVEL,destroy_virus,NULL);
+                virusSkipList = SL_create(MAX_SKIPLIST_LEVEL,NULL,NULL);
                 /* compare values is compare ID */
 
-                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                SL_insert(virusSkipList, &citizen->ID, citizen, compare_IDs);
                 // printf("%d inserted in NEW %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
 
-                map_insert(vaccSkipListMap, strdup(citizen->virusName),virusSkipList);
+                map_insert(vaccSkipListMap, citizen->virusName ,virusSkipList);
 
             }
 
@@ -233,20 +264,20 @@ int main(int argc, char *argv[]){
                 if(virusSkipList == NULL) { printf("Error!\n"); exit(EXIT_FAILURE); }
 
                 /* compare values is compare ID */
-                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                SL_insert(virusSkipList, &citizen->ID ,citizen, compare_IDs);
                 // printf("%d inserted in %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
             }
             else{
             /* if dont exists create skiplist, insert record */
 
                 /* create a skiplist for this virus */
-                virusSkipList = SL_create(MAX_SKIPLIST_LEVEL,destroy_virus,NULL);
+                virusSkipList = SL_create(MAX_SKIPLIST_LEVEL,NULL,NULL);
                 /* compare values is compare ID */
 
-                SL_insert(virusSkipList, create_int(citizen->ID),citizen, compare_values);
+                SL_insert(virusSkipList, &citizen->ID ,citizen, compare_IDs);
                 // printf("%d inserted in NEW %s **NOT** VACCINATED skiplist\n", citizen->ID, citizen->virusName);
 
-                map_insert(notVaccSkipListMap, strdup(citizen->virusName),virusSkipList);
+                map_insert(notVaccSkipListMap, citizen->virusName,virusSkipList);
 
             }
 
@@ -254,18 +285,9 @@ int main(int argc, char *argv[]){
              
         }
 
-        /* ----------------- COUNTRY POPULATION INSERT --------------------- */
-        MapNode m = MAP_EOF;
-        m = map_find_node(countryPopulationMap, citizen->country);
-        if(m != MAP_EOF){
-            int* population = map_node_value(countryPopulationMap, m);
-            (*population)++;
-        }
-        else{
-            map_insert(countryPopulationMap, citizen->country, create_int(1));
-        }
+        
         /* print citizen's fields to be sure */
-        printCitizen(citizen);
+        // printCitizen(citizen);
         if(parsedFirstName !=NULL) free(parsedFirstName);
         if(parsedLastName !=NULL) free(parsedLastName);
         if(parsedCountry !=NULL) free(parsedCountry);
@@ -273,9 +295,11 @@ int main(int argc, char *argv[]){
         if(parsedIsVaccinated !=NULL) free(parsedIsVaccinated);
         if(parsedDateVaccinated!=NULL) free(parsedDateVaccinated);
 
+
+
     }
 
-    // /* read user's input from keyboard */
+    /* read user's input from keyboard */
     USR_INPT input;
     while ( ( input = readUserInput(bloomSize, bloomFilterMap,vaccSkipListMap,notVaccSkipListMap, virusesList, countryPopulationMap,countriesList)) != USR_EXIT){
         switch (input){
@@ -315,26 +339,22 @@ int main(int argc, char *argv[]){
 
         }
     }
+
+
     printf("Record inserted : %d\n",map_size(citizenMap));
+    printf("Distinct record inserted : %d\n",map_size(distinctCitizens));
     printf("Bloomfilters created for VACCINATED people : %d\n",map_size(bloomFilterMap));
     printf("Skiplists created for VACCINATED people : %d\n",map_size(vaccSkipListMap));
     printf("Skiplists created for NOT VACCINATED people : %d\n",map_size(notVaccSkipListMap));
 
 
-    // MapNode m = map_find_node(countryPopulationMap, strdup("ARGETINA"));
-    //             if(m != MAP_EOF){
-    //                 int* population = map_node_value(countryPopulationMap, m);
-    //                 printf("population is %d ", *population);
-    //             }
-    //             else{
-    //                 printf("dont exist on the map \n");
-    //             }
 
     fclose(input_fp);
     free(recordFile);
     LL_destroy(virusesList);
     LL_destroy(countriesList);
     map_destroy(citizenMap);
+    map_destroy(distinctCitizens);
     map_destroy(bloomFilterMap);
     map_destroy(vaccSkipListMap);
     map_destroy(notVaccSkipListMap);
