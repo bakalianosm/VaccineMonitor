@@ -162,7 +162,7 @@ int main(int argc, char *argv[]){
 
         ListNode lnode = NULL;
 
-         /* insert virus on the list with the viruses if not extists */
+        /* insert virus on the list with the viruses if not extists */
         lnode = LL_find_node(virusesList, citizen->virusName, compare_viruses);
         if (lnode == NULL){
             LL_insert_after(virusesList, NULL, citizen->virusName);
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]){
 
                 /* compare values is compare ID */
                 SL_insert(virusSkipList, &citizen->ID ,citizen, compare_IDs);
-                // printf("%d inserted in %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+                printf("%d inserted in %s VACCINATED skiplist\n", citizen->ID, citizen->virusName);
             }
             else{
             /* if dont exists create skiplist, insert record */
@@ -275,7 +275,7 @@ int main(int argc, char *argv[]){
                 /* compare values is compare ID */
 
                 SL_insert(virusSkipList, &citizen->ID ,citizen, compare_IDs);
-                // printf("%d inserted in NEW %s **NOT** VACCINATED skiplist\n", citizen->ID, citizen->virusName);
+                printf("%d inserted in NEW %s **NOT** VACCINATED skiplist\n", citizen->ID, citizen->virusName);
 
                 map_insert(notVaccSkipListMap, citizen->virusName,virusSkipList);
 
@@ -285,7 +285,6 @@ int main(int argc, char *argv[]){
              
         }
 
-        
         /* print citizen's fields to be sure */
         // printCitizen(citizen);
         if(parsedFirstName !=NULL) free(parsedFirstName);
@@ -295,13 +294,11 @@ int main(int argc, char *argv[]){
         if(parsedIsVaccinated !=NULL) free(parsedIsVaccinated);
         if(parsedDateVaccinated!=NULL) free(parsedDateVaccinated);
 
-
-
     }
 
     /* read user's input from keyboard */
     USR_INPT input;
-    while ( ( input = readUserInput(bloomSize, bloomFilterMap,vaccSkipListMap,notVaccSkipListMap, virusesList, countryPopulationMap,countriesList)) != USR_EXIT){
+    while ( ( input = readUserInput(bloomSize, bloomFilterMap,vaccSkipListMap,notVaccSkipListMap, virusesList, countryPopulationMap,countriesList, citizenMap, distinctCitizens)) != USR_EXIT){
         switch (input){
             case INPT_1:
                 printGreen("vaccineStatusBloom\n");

@@ -69,6 +69,8 @@ void parseValues(char buffer[], char* array[]);
 /* A function that set the values of records' data array to values */
 ERR_CHK assignValues(char* valuesArray[],int *ID,   char **firstName, char **lastName, char **country, int *age, char **virusName, char **isVaccinated, char **dateVaccinated);
 
+ERR_CHK assignValuesForIoption(char* valuesArray[],int *ID,   char **firstName, char **lastName, char **country, int *age, char **virusName, char **isVaccinated, char **dateVaccinated);
+
 /* Creates a struct that is the values that gonna be hashed */
 hashRec initializeHashKey(int ID,char* virus);
 
@@ -93,4 +95,4 @@ void removeChar(char *str, char toRem);
 
 
 /* Read user's options */
-USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, LinkedList virusesList, Map countryPopulationMap, LinkedList countriesList);
+USR_INPT readUserInput(int bloomSize, Map bfMap, Map vaccSkipListMap, Map notVaccSkipListMap, LinkedList virusesList, Map countryPopulationMap, LinkedList countriesList, Map citizenMap, Map distinctCitizens);
