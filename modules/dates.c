@@ -17,8 +17,6 @@
 
 
 
-
-
 Date transformDate(char *dateString){
 
     Date dateStruct = malloc(sizeof(*dateStruct));
@@ -51,6 +49,7 @@ void printDate(Date date){
 }
 
 int compareDates(Date first, Date second){
+    /* First check year then, month and at last, day */
     if(first->year > second->year){
         return 1;
     }
@@ -86,7 +85,10 @@ int compareDates(Date first, Date second){
 
 int checkDateFromString(char* stringDate){
 
+    /* Take the given stringDate and transfrom it into a Date struct */
     Date date = transformDate(stringDate);
+
+    /* Error checking here */
     if(!(date->day >= 1 && date->day <=30)){
         printRed("Date error : invalid DAY\n");
         free(date);
@@ -120,19 +122,3 @@ int compareDateStrings(char* from, char* to){
 
     return ret;
 }
- /* 
-
-void transformDate(char* date){
-
-    char* array[3];
-
-    int i = 0;
-    array[i] = strtok(date, "/");
-    while(array[i] !=NULL ){
-        array[++i] = strtok(NULL, "/");
-    }
-
-    printf("date is %s %s %s\n",array[0], array[1], array[2]);
-
-}
-*/

@@ -35,7 +35,7 @@ LinkedList LL_create(DestroyFunc destroy){
     list->size = 0;
     list->destroyValue = destroy;
 
-    /* add dummy node, next of dummy will be null because the list is empty */
+    /* Add dummy node, next of dummy will be null because the list is empty */
     list->dummy = malloc(sizeof(*list->dummy));
     list->dummy->next = NULL;
 
@@ -92,7 +92,7 @@ void LL_insert_after(LinkedList list, ListNode node, Pointer value){
 void LL_insert_ordered(LinkedList list, Pointer value, CompareFunc compare){
 	ListNode prev = NULL;
 
-	// if list is empty then we have to insert at the start
+	/* If list is empty then we have to insert at the start */
 	if(LL_size(list)==0) {
 		LL_insert_at_start(list,value);
 	}
@@ -113,7 +113,7 @@ void LL_remove_next_item(LinkedList list, ListNode node){
 
     ListNode toRemove = node->next;
 
-    /* destroy the value of a node */
+    /* Destroy the value of a node */
     if (list->destroyValue != NULL)
         list->destroyValue(toRemove->value);
     
@@ -122,7 +122,7 @@ void LL_remove_next_item(LinkedList list, ListNode node){
 
     list->size--;
 
-    /* if the node to be removed is the last */
+    /* If the node to be removed is the last */
     if (list->last == toRemove)
         list->last = node;
 
@@ -135,7 +135,7 @@ Pointer LL_find(LinkedList list, Pointer value, CompareFunc compare){
 
 void LL_destroy(LinkedList list){
     ListNode node = list->dummy;
-    /* iterate trough the list and free the nodes */ 
+    /* Iterate trough the list and free the nodes */ 
     while (node != NULL){
         ListNode next = node->next;
 
@@ -145,12 +145,12 @@ void LL_destroy(LinkedList list){
         node = next;
     }
 
-    /* destroy the struct */
+    /* Destroy the struct */
     free(list);
 }
 
 ListNode LL_first(LinkedList list){
-    /* the next of dummy is the next */
+    /* The next of dummy is the next */
     return list->dummy->next;
 }
 
@@ -178,7 +178,7 @@ Pointer LL_node_val(ListNode node){
 
 ListNode LL_find_node(LinkedList list, Pointer value, CompareFunc compare){
     
-    /* iterate through the list */
+    /* Iterate through the list */
     for (ListNode node = list->dummy->next ; node != NULL; node=node->next)
         if (compare(value, node->value) == 0)
             return node;

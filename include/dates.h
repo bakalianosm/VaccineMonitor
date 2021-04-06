@@ -17,17 +17,17 @@ struct date {
 
 typedef struct date* Date;
 
-/* creates a date from a string */
+/*Ccreates a date from a string */
 Date transformDate(char *date);
 
-/* prints a date */
+/* Prints a date */
 void printDate(Date date);
 
-/* compares dates */
+/* Compares dates */
 int compareDates(Date first, Date second);
 
-/* checks if dateGiven in string is valid */
+/* Checks if dateGiven in string is valid */
 int checkDateFromString(char* stringDate);
 
-/* compares to dates from string */
+/* Compares to dates from string */
 int compareDateStrings(char* from, char* to);

@@ -12,35 +12,36 @@
 #include "map.h"
 #include "linkedList.h"	
 #define FIRST_HASH_SIZE 53
-// Χρησιμοποιούμε open addressing, οπότε σύμφωνα με την θεωρία, πρέπει πάντα να διατηρούμε
-// τον load factor του  hash table μικρότερο ή ίσο του 0.5, για να έχουμε αποδoτικές πράξεις
+
+
+/* Load factor is for open addressing to keep the Map's Complexity properties */
 #define MAX_LOAD_FACTOR 0.9
 
-// Δομή του κάθε κόμβου που έχει το hash table (με το οποίο υλοιποιούμε το map)
+/* Map node struct */
 struct map_node{
-	Pointer key;		// Το κλειδί που χρησιμοποιείται για να hash-αρουμε
-	Pointer value;  	// Η τιμή που αντισοιχίζεται στο παραπάνω κλειδί
+	Pointer key;		
+	Pointer value;  	
 } ;
 
-// Δομή του Map (περιέχει όλες τις πληροφορίες που χρεαζόμαστε για το HashTable)
+/* Map struct */
 struct map {
-	LinkedList* array;				// Ο πίνακας σπό λίστες που θα χρησιμοποιήσουμε για το map (remember, φτιάχνουμε ένα hash table)
-	int capacity;				// Πόσο χώρο έχουμε δεσμεύσει.
-	int size;					// Πόσα στοιχεία έχουμε προσθέσει
-	CompareFunc compare;		// Συνάρτηση για σύγκρηση δεικτών, που πρέπει να δίνεται απο τον χρήστη
-	HashFunc hash_function;		// Συνάρτηση για να παίρνουμε το hash code του κάθε αντικειμένου.
-	DestroyFunc destroy_key;	// Συναρτήσεις που καλούνται όταν διαγράφουμε έναν κόμβο απο το map.
+	LinkedList* array;			/* An array of lists */
+	int capacity;				/* How many capacity we have set */
+	int size;					/* How many elements we have added on the Map */
+	CompareFunc compare;		/* Compare keys function */
+	HashFunc hash_function;		
+	DestroyFunc destroy_key;	
 	DestroyFunc destroy_value;
 };
 
 
 Map map_create(CompareFunc compare, DestroyFunc destroy_key, DestroyFunc destroy_value) {
-	// Δεσμεύουμε κατάλληλα τον χώρο που χρειαζόμαστε για το hash table
+	/* Allocate the memory that the Map needs */
 	Map map = malloc(sizeof(*map));
 	map->capacity = FIRST_HASH_SIZE;
 	map->array = malloc(map->capacity * sizeof(LinkedList));
 
-	// Αρχικοποιούμε τις λίστες που έχουμε σαν διαθέσιμες.
+	/* Initialize empty lists */
 	for (int i = 0; i < map->capacity; i++){
 		map->array[i] = LL_create(free);
 	}
@@ -52,12 +53,12 @@ Map map_create(CompareFunc compare, DestroyFunc destroy_key, DestroyFunc destroy
 	return map;
 }
 
-// Επιστρέφει τον αριθμό των entries του map σε μία χρονική στιγμή.
+
 int map_size(Map map) {
 	return map->size;
 }
 
-// Συνάρτηση για την επέκταση του Hash Table σε περίπτωση που ο load factor μεγαλώσει πολύ.
+/* Extend the hash table in case of the Load Factor increases */
 static void rehash(Map map) {
 	int old_capacity = map->capacity ;
 	LinkedList* old_array = map->array;
@@ -72,9 +73,10 @@ static void rehash(Map map) {
 
 	map->size = 0;
 
+	/* Re enter the elements on the resized map */
 	for (int i = 0; i < old_capacity; i++){
-		for(ListNode node = LL_first(old_array[i]) ;          // ξενικάμε από τον πρώτο κόμβο
-    	node != NULL;                          // μέχρι να φτάσουμε στο EOF
+		for(ListNode node = LL_first(old_array[i]) ;          
+    	node != NULL;                          
     	node = LL_next(node)) { 
 			MapNode m = LL_node_val(node);
 			Pointer key = map_node_key(map,m);
@@ -90,25 +92,21 @@ static void rehash(Map map) {
 	return;
 }
 
-// Εισαγωγή στο hash table του ζευγαριού (key, item). Αν το key υπάρχει,
-// ανανέωση του με ένα νέο value, και η συνάρτηση επιστρέφει true.
 
 void map_insert(Map map, Pointer key, Pointer value) {
-	// Σκανάρουμε το Hash Table μέχρι να βρούμε διαθέσιμη θέση για να τοποθετήσουμε το ζευγάρι,
-	// ή μέχρι να βρούμε το κλειδί ώστε να το αντικαταστήσουμε.
 	
+	/* Assume that the node to be inserted does not exists */
 	bool already_in_map = false;
 
-	// Βρίσκουμε που χασάρει το κλειδί
+	/* Find where the key hashes */
 	uint bucket;
 	bucket = map->hash_function(key) % map->capacity;	
 	
-	// Ο κόμβος που θα ελέγχξουμε αν υπάρχει ήδη (το κλειδί συγκεκριμένα)
+	/* Check if a node with the given key exists */
 	MapNode toFind = map_find_node(map,key);
 	if(toFind!=MAP_EOF) already_in_map = true;
 	
-	// Σε αυτή την περίπτωση , κοιτάω το γεγονός το κλειδί αυτό να υπάρχει
-	// ήδη στο  Map. Αν υπάρχει, ουσιαστικά του αλλάζω του value 
+	/* And if exists, replace the old node with the new */
 	if(already_in_map){
 		if (toFind->key != key && map->destroy_key != NULL)
 			map->destroy_key(toFind->key);
@@ -119,22 +117,23 @@ void map_insert(Map map, Pointer key, Pointer value) {
 		toFind->key = key;
 		toFind->value = value;
 	}
-	// Αν δεν υπάρχει στο Map το key 
 	else{
-
-		// Δημιουργία του κόμβου προς εισαγωγή
+		/* If not exists */
+		
+		
+		/* Create a new node */
 		MapNode toInsert  = malloc(sizeof(*toInsert));
 		toInsert->key = key;
 		toInsert->value = value;
 
-		// Εισαγωή νέου κόμβου στο Map
+		/* And insert it on the corresponding bucket */
 		LL_insert_after(map->array[bucket], NULL, toInsert);
 
-		// Αύξηση του μεγέθους του
+		/* Increase size */
 		map->size++;
 	}
 
-	// Αν με την νέα εισαγωγή ξεπερνάμε το μέγιστο load factor, πρέπει να κάνουμε rehash
+	/* If with the new insertion we overcome the load factor */
 	float load_factor = (float)map->size / map->capacity;
 	if (load_factor > MAX_LOAD_FACTOR) {
 		// printf("LOAD FACTOR IS %f\n",load_factor);
@@ -142,49 +141,46 @@ void map_insert(Map map, Pointer key, Pointer value) {
 	}
 }
 
-// Διαργραφή απο το Hash Table του κλειδιού με τιμή key
+
 bool map_remove(Map map, Pointer key) {
 	
-	// Βρίσκουμε που χασάρει ο κόμβος του ορίσματος 
+	/* Find where the key hashes */
 	uint bucket;
 	bucket = map->hash_function(key) % map->capacity;
 
-	// Φτιάχνουμε βοηθητικούς κόμβους
+	/* Make help nodes */
 	ListNode prev=NULL;
 	MapNode m;
 
-	// Διατρέχουμε τη λίστα
+	/* Iterate thourgh the bucket (--List--) */
 	for(ListNode node = LL_first(map->array[bucket]) ;          
     node != NULL;                          
     node = LL_next(node)) {            
 		m = LL_node_val(node);
 		int* node_key = map_node_key(map,m );  
 		
-		// Μόλις βρεθεί στη λίστα ο κόμβος που θα διαγραφεί
-		// Σε αυτό το σημείο αν είναι ο πρώτος θα διαγραφεί με τη χρήση
-		// της LL_remove_next_item αλλιώς θα προχωρήσει και θα ενημερώσει
-		// τον κόμβο prev και θα διαγράψουμε τον επόμενο του prev.
+		
 		if(map->compare(key,node_key)==0) {
 			if (map->destroy_key != NULL)
 				map->destroy_key(m->key);
 			if (map->destroy_value != NULL)
 				map->destroy_value(m->value);
 
-			// Αφαιρούμε τον κόμβο	
+			/* Remove node */	
 			LL_remove_next_item(map->array[bucket],prev);
 
-			// Μειώνουμε το μέγεθος
+			/* Decrease size */
 			map->size--;
 			return true;
 		} 
 		prev = node;
 	}
-	// Αν δε δούλεψε σωστά ο αλγόριθμος ή εάν δε βρέθηκε 
-	// ο κόμβος επιστρέφει false
+	
+	/* If the node did not found */
 	return false;
 }
 
-// Αναζήτηση στο map, με σκοπό να επιστραφεί το value του κλειδιού που περνάμε σαν όρισμα.
+
 
 Pointer map_find(Map map, Pointer key) {
 	MapNode node = map_find_node(map, key);
@@ -207,40 +203,42 @@ DestroyFunc map_set_destroy_value(Map map, DestroyFunc destroy_value) {
 	return old;
 }
 
-// Απελευθέρωση μνήμης που δεσμεύει το map
+
 void map_destroy(Map map) {
 
-	// Διατρέχουμε όλες τις λίστες του πίνακα λιστών 
+	/* Iterate thought the list array */
 	for (int i = 0 ; i< map->capacity ; i++){
-		// Και για κάθε κόμβο λίστας 
+		/* And for each list node */
 		for(ListNode node = LL_first(map->array[i]) ;          
     	node != NULL;                          
     	node = LL_next(node)) {   
 
-			// Φέρνουμε στη μνήμη τον αντίστοιχο MapNode που περιέχει        
+			/* Get the Map node */
 			MapNode m = LL_node_val(node);
 
-				// Και καταστρέφουμε το περιεχόμενό του
+				/* And destroy it's content */
 				if (map->destroy_key != NULL)
 					map->destroy_key(m->key);
 				if (map->destroy_value != NULL)
 					map->destroy_value(m->value);
 			}
-		// Εφόσον αυτό έχει γίνει για κάθε περιεχόμενο κόμβου λίστας 
-		// Ελευθερώνουμε και τη λίστα
+		
+		/* Destroy the list */
 		LL_destroy(map->array[i]);
 	}
 	
-	// Ελευθερώνουμε τον πίνακα λιστών 
+	/* Free the List Array */
 	free(map->array);
 
-	// Καθώς και το όλο Map
+	/* And the whole map */
 	free(map);
 }
 
-/////////////////////// Διάσχιση του map μέσω κόμβων ///////////////////////////
+/* Map iteration */
 
 MapNode map_first(Map map) {
+
+	/* Return the first element of the first list */
 	if(map->array[0]!=NULL)
 		if(LL_first(map->array[0])!= NULL) return LL_node_val(LL_first(map->array[0]));
 	return MAP_EOF;
@@ -248,38 +246,34 @@ MapNode map_first(Map map) {
 
 MapNode map_next(Map map, MapNode node) {
 
-	// Βρίσκουμε που χασάρει ο κόμβος του ορίσματος 
-	// ώστε να επιστρέψουμε τον επόμενο κόμβο στην λίστα 
+	/* Find where the key hases */
 	uint bucket;
 	bucket = map->hash_function(node->key) % map->capacity;
 	
-	// Βρίσκουμε τον κόμβο λίστας που περιλαμβάνει τον node
-	// Διατρέχουμε τη λίστα απ την αρχή μέχρι να βρούμε τον κόμβο
-	// που περιέχει τον node του ορίσματος
 
+	/* And then find the List Node that contains the given node */
 	ListNode lnode ;
 	for( lnode = LL_first(map->array[bucket]) ;          
     lnode != NULL;                          
     lnode = LL_next(lnode)) {            
-		MapNode m = (MapNode)LL_node_val(lnode); // παίρνουμε το περιεχόμενο του κόμβου λίστας
-		Pointer node_key = map_node_key(map,m );  		  // το κλειδί του κόμβου
-		Pointer node_value = map_node_value(map,m );	  //η τιμή του κόμβου
-		// Αν ο κόμβος είναι αυτός που μας ενδιαφέρει , τον βρήκαμε και σταματάμε
+		MapNode m = (MapNode)LL_node_val(lnode); /* Get the node value */
+		Pointer node_key = map_node_key(map,m );  		  /* Get the key */
+		Pointer node_value = map_node_value(map,m );	  /* Get the value */
+		/* If the node found , stop */
 		if(map->compare(node->key,node_key)==0 && map->compare(node->value,node_value)==0) break; 
 	}
 
-	// Αν υπάρχει επόμενος του στη λίστα , τον επιστρέφω 
+	/* If exists next ,return it */
 	if(LL_next(lnode)!=NULL) 
 		return LL_node_val(LL_next(lnode));
 	else{
-	// Αλλιώς πάω στο επόμενο bucket και επιστρέφω τον πρώτο κόμβο .	
+	/* Else search on the next bucket */
 		bucket++;
 		if(bucket <= map->capacity ) {
 			if(LL_first(map->array[bucket])!=NULL)
 				return LL_node_val(LL_first(map->array[bucket]));
 		}
 	}
-	// Διαφορετικά κάτι πήγε λάθος
 	return MAP_EOF;
 }
 
@@ -296,28 +290,28 @@ MapNode map_find_node(Map map, Pointer key) {
 	uint bucket;
 	bucket = map->hash_function(key) % map->capacity;
 	
-	// διατρέχω τη λίστα 
-	for(ListNode node = LL_first(map->array[bucket]) ;          // ξενικάμε από τον πρώτο κόμβο
-    node != NULL;                          // μέχρι να φτάσουμε στο EOF
-    node = LL_next(node)) {            // μετάβαση στον επόμενο κόμβο
+	/* Iterate throught the bucket (--List--) */
+	for(ListNode node = LL_first(map->array[bucket]) ;          
+    node != NULL;                         
+    node = LL_next(node)) {            
 		MapNode m = LL_node_val(node);
-		Pointer node_key = map_node_key(map,m );  // η τιμή του συγκεκριμένου κόμβου
+		Pointer node_key = map_node_key(map,m );  
 		if(map->compare(key,node_key)==0) return m;
 		
 	}
 	return MAP_EOF;
 }
 
-// Αρχικοποίηση της συνάρτησης κατακερματισμού του συγκεκριμένου map.
+
 void map_set_hash_function(Map map, HashFunc func) {
 	map->hash_function = func;
 }
 
 uint hash_string(Pointer value) {
-	// djb2 hash function, απλή, γρήγορη, και σε γενικές γραμμές αποδοτική
+	
     uint hash = 5381;
     for (char* s = value; *s != '\0'; s++)
-		hash = (hash << 5) + hash + *s;			// hash = (hash * 33) + *s. Το foo << 5 είναι γρηγορότερη εκδοχή του foo * 32.
+		hash = (hash << 5) + hash + *s;			
     return hash;
 }
 
@@ -326,5 +320,5 @@ uint hash_int(Pointer value) {
 }
 
 uint hash_pointer(Pointer value) {
-	return (size_t)value;				// cast σε sizt_t, που έχει το ίδιο μήκος με έναν pointer
+	return (size_t)value;				
 }

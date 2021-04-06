@@ -56,11 +56,17 @@ int bf_numK(BloomFilter bloomfilter){
 void bf_insert(BloomFilter bloomfilter, unsigned char* str){
     
     for (int i = 0 ; i < bloomfilter->numK ; i++){
+
+        /* Hash the given string */
         unsigned long retVal = bloomfilter->HF(str, i);
         /* printf("hash is %lu\t", retVal); */
 
         int num = retVal % (bloomfilter->size * 8 *sizeof(char));
+        
+        /* Find which byte to change */
         int byte =  num/8;
+
+        /* Find which bit on byte to change  */
         int bitOnByte = num%8;
        
         /* Change bit value */
@@ -86,6 +92,7 @@ int bf_search(BloomFilter bloomfilter, unsigned char* str){
         
         /* printf("bit value is %d\n", bit); */
 
+        /* If the bit's value is 0 the element is not in the Bloom Filter */
         if(bit==0)
             return 0;
     }
@@ -102,18 +109,15 @@ void bf_destroy(BloomFilter bloomfilter){
 }
 
 
-
-
 /* --------------------------------------------------------
  * ------------------- HASH FUNCTIONS ---------------------
  * --------------------------------------------------------
  */
 
 ulong djb2(unsigned char* value) {
-	// djb2 hash function, απλή, γρήγορη, και σε γενικές γραμμές αποδοτική
     uint hash = 5381;
     for (unsigned char* s = value; *s != '\0'; s++)
-		hash = (hash << 5) + hash + *s;			// hash = (hash * 33) + *s. Το foo << 5 είναι γρηγορότερη εκδοχή του foo * 32.
+		hash = (hash << 5) + hash + *s;		
     return hash;
 }
 
