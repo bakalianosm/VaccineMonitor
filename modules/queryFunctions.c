@@ -482,7 +482,10 @@ void insertCitizenRecord(int numOfArguments,int bloomSize, char str[], char* arr
         char *parsedFirstName = NULL, *parsedLastName = NULL, *parsedCountry = NULL, *parsedVirusName = NULL, *parsedIsVaccinated = NULL, *parsedDateVaccinated = NULL ; 
         
         parseValues(str,arr);
-        
+        if (!checkID(arr[1])){
+            printRed("insertCitizenRecord : ERROR! Invalid citizen ID given. Try again\n");
+            return;
+        }
         ERR_CHK error = assignValuesForIoption(arr,&parsedID, &parsedFirstName, &parsedLastName, &parsedCountry, &parsedAge, &parsedVirusName, &parsedIsVaccinated, &parsedDateVaccinated);
 
         if(error != NO_ERROR){
@@ -596,6 +599,11 @@ void vaccinateNow(int numOfArguments,int bloomSize, char str[], char* arr[], Map
         
         
         int searchID ;
+
+        if (!checkID(arr[1])){
+            printRed("vaccinateNow : ERROR! Invalid citizen ID given. Try again\n");
+            return;
+        }
         searchID = atoi(arr[1]);
 
         parsedID = atoi(arr[1]);
